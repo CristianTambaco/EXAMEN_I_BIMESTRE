@@ -1,4 +1,4 @@
-// app/plan/crear.tsx (Solo para asesores)
+// app/plan/crear.tsx
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -119,7 +119,6 @@ export default function CrearPlanScreen() {
         <TextInput style={globalStyles.input} placeholder="WhatsApp" value={whatsapp} onChangeText={setWhatsapp} />
         <TextInput style={globalStyles.input} placeholder="Llamadas Internacionales" value={llamadasInternacionales} onChangeText={setLlamadasInternacionales} />
         <TextInput style={globalStyles.input} placeholder="Roaming" value={roaming} onChangeText={setRoaming} />
-
         <TouchableOpacity
           style={[
             globalStyles.button,

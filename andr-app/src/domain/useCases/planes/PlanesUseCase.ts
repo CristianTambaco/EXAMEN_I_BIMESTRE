@@ -6,7 +6,7 @@ export class PlanesUseCase {
   async obtenerPlanesActivos(): Promise<Plan[]> {
     try {
       const { data, error } = await supabase
-        .from("planes_moviles") // Asumiendo nombre de tabla en Supabase
+        .from("planes_moviles")
         .select("*")
         .eq("activo", true)
         .order("created_at", { ascending: false });
@@ -66,15 +66,10 @@ export class PlanesUseCase {
 
   async eliminarPlan(id: string): Promise<{ success: boolean; error?: string }> {
     try {
-      // Opción 1: Eliminar permanentemente (no recomendada)
-      // const { error } = await supabase.from("planes_moviles").delete().eq("id", id);
-
-      // Opción 2: Marcar como inactivo (recomendada)
       const { error } = await supabase
         .from("planes_moviles")
         .update({ activo: false })
         .eq("id", id);
-
       if (error) throw error;
       return { success: true };
     } catch (error: any) {

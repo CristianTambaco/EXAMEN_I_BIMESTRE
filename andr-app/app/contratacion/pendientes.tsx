@@ -1,4 +1,4 @@
-// app/contratacion/pendientes.tsx (Solicitudes Pendientes para Asesor)
+// app/contratacion/pendientes.tsx
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
@@ -21,15 +21,15 @@ import {
 } from "../../src/styles/theme";
 
 export default function ContratacionesPendientesScreen() {
-  const { esAsesorComercial } = useAuth(); // Verificar rol
+  const { esAsesorComercial } = useAuth();
   const { cargarContratacionesPendientes, aprobar, rechazar } = useContrataciones();
-  const [contrataciones, setContrataciones] = useState<any[]>([]); // Cambiar tipo a Contratacion
+  const [contrataciones, setContrataciones] = useState<any[]>([]);
   const [cargando, setCargando] = useState(true);
   const [refrescando, setRefrescando] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    if (esAsesorComercial) { // Solo si es asesor
+    if (esAsesorComercial) {
       cargarDatos();
     }
   }, [esAsesorComercial]);
@@ -70,7 +70,7 @@ export default function ContratacionesPendientesScreen() {
             const resultado = await aprobar(id);
             if (resultado.success) {
               Alert.alert("Éxito", "Contratación aprobada");
-              await cargarDatos(); // Recargar lista
+              await cargarDatos();
             } else {
               Alert.alert("Error", resultado.error || "No se pudo aprobar");
             }
@@ -93,7 +93,7 @@ export default function ContratacionesPendientesScreen() {
             const resultado = await rechazar(id);
             if (resultado.success) {
               Alert.alert("Éxito", "Contratación rechazada");
-              await cargarDatos(); // Recargar lista
+              await cargarDatos();
             } else {
               Alert.alert("Error", resultado.error || "No se pudo rechazar");
             }

@@ -4,13 +4,12 @@ import React from "react";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { useAuth } from "../../src/presentation/hooks/useAuth"; // Importar hook de auth
+import { useAuth } from "../../src/presentation/hooks/useAuth";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
-  const { esAsesorComercial, esUsuarioRegistrado } = useAuth(); // Obtener roles
+  const { esAsesorComercial, esUsuarioRegistrado } = useAuth();
 
-  // Definir pestañas para Asesor
   if (esAsesorComercial) {
     return (
       <Tabs
@@ -22,14 +21,14 @@ export default function TabLayout() {
         <Tabs.Screen
           name="index"
           options={{
-            title: "Dashboard",
+            title: "Inicio",
             tabBarIcon: ({ color }) => (
-              <MaterialIcons name="dashboard" size={28} color={color} />
+              <MaterialIcons name="home" size={28} color={color} />
             ),
           }}
         />
         <Tabs.Screen
-          name="misPlanes" // Renombrar si es necesario
+          name="misPlanes"
           options={{
             title: "Mis Planes",
             tabBarIcon: ({ color }) => (
@@ -38,7 +37,7 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="contratacion/pendientes" // Nueva pestaña
+          name="contratacion/pendientes"
           options={{
             title: "Solicitudes",
             tabBarIcon: ({ color }) => (
@@ -56,7 +55,7 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="progreso" // Puede ser Perfil
+          name="perfil"
           options={{
             title: "Perfil",
             tabBarIcon: ({ color }) => (
@@ -68,7 +67,6 @@ export default function TabLayout() {
     );
   }
 
-  // Definir pestañas para Usuario Registrado
   if (esUsuarioRegistrado) {
     return (
       <Tabs
@@ -87,16 +85,16 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="misPlanes" // Renombrar si es necesario -> Catálogo
+          name="misPlanes"
           options={{
             title: "Catálogo",
             tabBarIcon: ({ color }) => (
-              <MaterialIcons name="list" size={28} color={color} />
+              <MaterialIcons name="shopping-cart" size={28} color={color} />
             ),
           }}
         />
         <Tabs.Screen
-          name="rutinasAsignadas" // Renombrar si es necesario -> Mis Contrataciones
+          name="rutinasAsignadas"
           options={{
             title: "Mis Contrataciones",
             tabBarIcon: ({ color }) => (
@@ -114,7 +112,7 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="progreso" // Puede ser Perfil
+          name="perfil"
           options={{
             title: "Perfil",
             tabBarIcon: ({ color }) => (
@@ -126,7 +124,6 @@ export default function TabLayout() {
     );
   }
 
-  // Si no hay rol definido, mostrar pestañas genéricas o una pantalla de carga
   return (
     <Tabs
       screenOptions={{
@@ -134,7 +131,6 @@ export default function TabLayout() {
         headerShown: false,
       }}
     >
-      {/* Opcional: Mostrar una pestaña de carga o un placeholder */}
       <Tabs.Screen name="index" options={{ href: null }} />
     </Tabs>
   );

@@ -10,7 +10,11 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (cargando) return;
-    const enAuth = segments[0] === "auth";
+
+    // 👇 Castear explícitamente a string para evitar advertencias de TypeScript
+    const enAuth = segments[0] as string === "auth";
+    const enInvitado = segments[0] as string === "invitado";
+    const enTabs = segments[0] as string === "tabs";
 
     if (!usuario && !enAuth) {
       router.replace("/auth/login");
@@ -21,9 +25,11 @@ export default function RootLayout() {
       } else if (usuario.rol === "usuario_registrado") {
         router.replace("/(tabs)");
       } else {
-        // Rol no reconocido, volver a login
         router.replace("/auth/login");
       }
+    } else if (enInvitado && usuario) {
+      // Si está autenticado y trata de acceder como invitado, redirigir
+      router.replace("/(tabs)");
     }
   }, [usuario, segments, cargando]);
 
@@ -31,8 +37,7 @@ export default function RootLayout() {
     <Stack>
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="auth" options={{ headerShown: false }} />
-      <Stack.Screen name="plan" options={{ headerShown: false }} />
-      <Stack.Screen name="contratacion" options={{ headerShown: false }} />
+      <Stack.Screen name="(invitado)" options={{ headerShown: false }} />
       <Stack.Screen name="detallePlan" options={{ headerShown: false }} />
     </Stack>
   );

@@ -12,7 +12,6 @@ import { colors, spacing } from "../../src/styles/theme";
 
 export default function HomeInvitado() {
   const router = useRouter();
-
   return (
     <View style={globalStyles.containerCentered}>
       <Text style={styles.titulo}>Bienvenido a Tigo</Text>

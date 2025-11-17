@@ -1,3 +1,4 @@
+// app/auth/registro.tsx
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -19,35 +20,27 @@ import {
 } from "../../src/styles/theme";
 
 export default function RegistroScreen() {
+  const [nombre, setNombre] = useState("");
   const [email, setEmail] = useState("");
+  const [telefono, setTelefono] = useState("");
   const [password, setPassword] = useState("");
-  const [rolSeleccionado, setRolSeleccionado] = useState<"entrenador" | "usuario">(
-    "usuario" // Por defecto: usuario
-  );
   const [cargando, setCargando] = useState(false);
   const { registrar } = useAuth();
   const router = useRouter();
 
   const handleRegistro = async () => {
-    // VALIDACIÓN 1: Campos vacíos
-    if (!email || !password) {
+    if (!nombre || !email || !telefono || !password) {
       Alert.alert("Error", "Completa todos los campos");
       return;
     }
-
-    // VALIDACIÓN 2: Longitud de contraseña
     if (password.length < 6) {
       Alert.alert("Error", "La contraseña debe tener al menos 6 caracteres");
       return;
     }
-
-    // REGISTRO
     setCargando(true);
-    const resultado = await registrar(email, password, rolSeleccionado);
+    const resultado = await registrar(email, password, "usuario_registrado");
     setCargando(false);
-
     if (resultado.success) {
-      // Éxito: Redirigir a login
       Alert.alert("Éxito", "Cuenta creada correctamente", [
         { text: "OK", onPress: () => router.replace("/auth/login") },
       ]);
@@ -59,8 +52,13 @@ export default function RegistroScreen() {
   return (
     <View style={globalStyles.container}>
       <View style={globalStyles.contentPadding}>
-        <Text style={globalStyles.title}>Crear Cuenta</Text>
-
+        <Text style={globalStyles.title}>Registro</Text>
+        <TextInput
+          style={globalStyles.input}
+          placeholder="Nombre Completo"
+          value={nombre}
+          onChangeText={setNombre}
+        />
         <TextInput
           style={globalStyles.input}
           placeholder="Email"
@@ -69,7 +67,13 @@ export default function RegistroScreen() {
           autoCapitalize="none"
           keyboardType="email-address"
         />
-
+        <TextInput
+          style={globalStyles.input}
+          placeholder="Teléfono"
+          value={telefono}
+          onChangeText={setTelefono}
+          keyboardType="phone-pad"
+        />
         <TextInput
           style={globalStyles.input}
           placeholder="Contraseña (mínimo 6 caracteres)"
@@ -77,47 +81,6 @@ export default function RegistroScreen() {
           onChangeText={setPassword}
           secureTextEntry
         />
-
-        {/* SELECTOR DE ROL */}
-        <Text style={styles.labelRol}>Selecciona tu rol:</Text>
-        <View style={styles.contenedorRoles}>
-          {/* BOTÓN: Usuario */}
-          <TouchableOpacity
-            style={[
-              styles.botonRol,
-              rolSeleccionado === "usuario" && styles.botonRolActivo,
-            ]}
-            onPress={() => setRolSeleccionado("usuario")}
-          >
-            <Text
-              style={[
-                styles.textoRol,
-                rolSeleccionado === "usuario" && styles.textoRolActivo,
-              ]}
-            >
-              Usuario
-            </Text>
-          </TouchableOpacity>
-
-          {/* BOTÓN: Entrenador */}
-          <TouchableOpacity
-            style={[
-              styles.botonRol,
-              rolSeleccionado === "entrenador" && styles.botonRolActivo,
-            ]}
-            onPress={() => setRolSeleccionado("entrenador")}
-          >
-            <Text
-              style={[
-                styles.textoRol,
-                rolSeleccionado === "entrenador" && styles.textoRolActivo,
-              ]}
-            >
-              Entrenador
-            </Text>
-          </TouchableOpacity>
-        </View>
-
         <TouchableOpacity
           style={[globalStyles.button, globalStyles.buttonPrimary]}
           onPress={handleRegistro}
@@ -126,10 +89,9 @@ export default function RegistroScreen() {
           {cargando ? (
             <ActivityIndicator color={colors.white} />
           ) : (
-            <Text style={globalStyles.buttonText}>Registrarse</Text>
+            <Text style={globalStyles.buttonText}>Crear Cuenta</Text>
           )}
         </TouchableOpacity>
-
         <TouchableOpacity onPress={() => router.back()}>
           <Text style={styles.linkVolver}>Volver al inicio de sesión</Text>
         </TouchableOpacity>
@@ -139,38 +101,6 @@ export default function RegistroScreen() {
 }
 
 const styles = StyleSheet.create({
-  labelRol: {
-    fontSize: fontSize.md,
-    marginBottom: spacing.sm,
-    color: colors.textPrimary,
-    fontWeight: "500",
-  },
-  contenedorRoles: {
-    flexDirection: "row",
-    gap: spacing.sm,
-    marginBottom: spacing.lg,
-  },
-  botonRol: {
-    flex: 1,
-    padding: spacing.md,
-    borderRadius: borderRadius.md,
-    borderWidth: 2,
-    borderColor: colors.border,
-    alignItems: "center",
-    backgroundColor: colors.white,
-  },
-  botonRolActivo: {
-    borderColor: colors.primary,
-    backgroundColor: colors.primaryLight,
-  },
-  textoRol: {
-    fontSize: fontSize.md,
-    color: colors.textSecondary,
-  },
-  textoRolActivo: {
-    color: colors.primary,
-    fontWeight: "bold",
-  },
   linkVolver: {
     textAlign: "center",
     marginTop: spacing.lg,

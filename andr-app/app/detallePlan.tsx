@@ -26,7 +26,6 @@ export default function DetallePlanScreen() {
   const { usuario } = useAuth();
   const { crear } = usePlanes();
   const router = useRouter();
-
   const [plan, setPlan] = useState<Plan | null>(null);
   const [cargando, setCargando] = useState(true);
 
@@ -48,7 +47,7 @@ export default function DetallePlanScreen() {
     } catch (error) {
       console.error("Error al cargar el plan:", error);
       Alert.alert("Error", "No se pudo cargar el plan");
-      router.back(); // Volver a la pantalla anterior
+      router.back();
     } finally {
       setCargando(false);
     }
@@ -63,9 +62,8 @@ export default function DetallePlanScreen() {
       Alert.alert("Error", "Plan no disponible.");
       return;
     }
-    // Aquí iría la lógica para crear la contratación
     Alert.alert("Éxito", "¡Solicitud de contratación enviada! Espera la aprobación del asesor.");
-    // router.push("/(usuario)/misContrataciones"); // Navegar a Mis Contrataciones
+    router.push("/(tabs)/rutinasAsignadas");
   };
 
   if (cargando) {
@@ -117,8 +115,6 @@ export default function DetallePlanScreen() {
             <Text style={globalStyles.textSecondary}>Llamadas Internacionales: {plan.llamadas_internacionales}</Text>
             <Text style={globalStyles.textSecondary}>Roaming: {plan.roaming}</Text>
         </View>
-
-        {/* Botón de contratación solo si el usuario está autenticado */}
         {usuario && (
             <TouchableOpacity
               style={[
@@ -156,7 +152,6 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     backgroundColor: colors.white,
     borderRadius: 8,
-    
   },
   detalleTitulo: {
     fontSize: fontSize.lg,

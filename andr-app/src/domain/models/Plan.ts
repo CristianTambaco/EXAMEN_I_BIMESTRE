@@ -15,7 +15,7 @@ export interface Plan {
   roaming: string;
   imagen_url?: string;
   activo: boolean;
-  asesor_id: string; // ID del asesor comercial que creó el plan
+  asesor_id: string;
   created_at: string;
   updated_at: string;
 }

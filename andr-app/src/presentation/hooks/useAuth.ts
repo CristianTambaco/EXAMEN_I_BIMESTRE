@@ -1,5 +1,4 @@
 // src/presentation/hooks/useAuth.ts
-
 import { useEffect, useState } from "react";
 import { StorageService } from "../../data/services/storageService";
 import { Usuario } from "../../domain/models/Usuario";
@@ -55,7 +54,7 @@ export function useAuth() {
   const registrar = async (
     email: string,
     password: string,
-    rol: "asesor_comercial" | "usuario_registrado" // 
+    rol: "asesor_comercial" | "usuario_registrado"
   ) => {
     const resultado = await authUseCase.registrar(email, password, rol);
     if (resultado.success && resultado.needsConfirmation) {
@@ -107,7 +106,7 @@ export function useAuth() {
     iniciarSesion,
     cerrarSesion,
     crearPerfilConRol,
-    esAsesorComercial: usuario?.rol === "asesor_comercial", // 
-    esUsuarioRegistrado: usuario?.rol === "usuario_registrado", // 
+    esAsesorComercial: usuario?.rol === "asesor_comercial",
+    esUsuarioRegistrado: usuario?.rol === "usuario_registrado",
   };
 }

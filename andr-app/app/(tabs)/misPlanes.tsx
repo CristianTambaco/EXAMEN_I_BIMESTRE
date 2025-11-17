@@ -1,4 +1,4 @@
-// app/(tabs)/misPlanes.tsx (Ahora Catálogo para Usuario, Mis Planes para Asesor)
+// app/(tabs)/misPlanes.tsx
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
@@ -37,6 +37,31 @@ export default function MisPlanesScreen() {
     cargar();
   }, [esAsesorComercial, esUsuarioRegistrado, usuario?.id]);
 
+  // 👇 Define la función handleEliminar aquí
+  const handleEliminar = async (planId: string) => {
+    Alert.alert(
+      "Confirmar eliminación",
+      "¿Estás seguro de que quieres eliminar este plan?",
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Eliminar",
+          style: "destructive",
+          onPress: async () => {
+            const resultado = await eliminar(planId); // 👈 Llama a la función del hook
+            if (resultado.success) {
+              Alert.alert("Éxito", "Plan eliminado correctamente");
+              // Opcional: Recargar lista si es necesario
+              // await cargarPlanesAsesor(usuario?.id || "");
+            } else {
+              Alert.alert("Error", resultado.error || "No se pudo eliminar");
+            }
+          },
+        },
+      ]
+    );
+  };
+
   const handleRefresh = async () => {
     setRefrescando(true);
     if (esAsesorComercial && usuario?.id) {
@@ -47,33 +72,10 @@ export default function MisPlanesScreen() {
     setRefrescando(false);
   };
 
-  const handleEliminar = (planId: string) => {
-    Alert.alert(
-      "Confirmar eliminación",
-      "¿Estás seguro de que quieres eliminar este plan?",
-      [
-        { text: "Cancelar", style: "cancel" },
-        {
-          text: "Eliminar",
-          style: "destructive",
-          onPress: async () => {
-            const resultado = await eliminar(planId);
-            if (resultado.success) {
-              Alert.alert("Éxito", "Plan eliminado correctamente");
-              // La lista se recargará automáticamente al refrescar o al volver a la pantalla
-            } else {
-              Alert.alert("Error", resultado.error || "No se pudo eliminar");
-            }
-          },
-        },
-      ]
-    );
-  };
-
   const renderItem = ({ item }: { item: any }) => (
     <View style={globalStyles.card}>
       <Text style={styles.tituloPlan}>{item.nombre_comercial}</Text>
-      <Text style={globalStyles.textSecondary}>${item.precio}/mes</Text>
+      <Text style={globalStyles.textPrimary}>${item.precio}/mes</Text>
       <Text style={globalStyles.textSecondary} numberOfLines={2}>
         {item.publico_objetivo}
       </Text>
@@ -95,7 +97,7 @@ export default function MisPlanesScreen() {
               globalStyles.buttonDanger,
               styles.botonAccion,
             ]}
-            onPress={() => handleEliminar(item.id)}
+            onPress={() => handleEliminar(item.id)} // 👈 Ahora sí existe
           >
             <Text style={globalStyles.buttonText}>🗑️ Eliminar</Text>
           </TouchableOpacity>
@@ -104,9 +106,9 @@ export default function MisPlanesScreen() {
       {esUsuarioRegistrado && (
         <TouchableOpacity
           style={[globalStyles.button, globalStyles.buttonPrimary, styles.botonContratar]}
-          onPress={() => router.push(`/detallePlan?id=${item.id}`)} // Navegar a detalle para contratar
+          onPress={() => router.push(`/detallePlan?id=${item.id}`)}
         >
-          <Text style={globalStyles.buttonText}>Contratar</Text>
+          <Text style={globalStyles.buttonText}>Ver Detalles</Text>
         </TouchableOpacity>
       )}
     </View>

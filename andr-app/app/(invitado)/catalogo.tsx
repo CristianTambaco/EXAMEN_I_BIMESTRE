@@ -18,7 +18,7 @@ export default function CatalogoPlanes() {
   const router = useRouter();
 
   useEffect(() => {
-    cargarPlanesPublicos(); // Carga solo los planes activos
+    cargarPlanesPublicos();
   }, []);
 
   const renderItem = ({ item }: { item: any }) => (

@@ -9,7 +9,7 @@ export class ContratacionesUseCase {
   ): Promise<{ success: boolean; error?: string; contratacion?: Contratacion }> {
     try {
       const { data, error } = await supabase
-        .from("contrataciones") // Asumiendo nombre de tabla en Supabase
+        .from("contrataciones")
         .insert({ usuario_id: usuarioId, plan_id: planId, estado: "pendiente" })
         .select()
         .single();
@@ -74,7 +74,7 @@ export class ContratacionesUseCase {
     try {
       const { error } = await supabase
         .from("contrataciones")
-        .update({ estado: "rechazada", observaciones: "Rechazado por el asesor." }) // Observación opcional
+        .update({ estado: "rechazada", observaciones: "Rechazado por el asesor." })
         .eq("id", id);
       if (error) throw error;
       return { success: true };

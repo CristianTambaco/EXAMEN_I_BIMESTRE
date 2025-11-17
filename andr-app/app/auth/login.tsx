@@ -5,7 +5,6 @@ import {
   ActivityIndicator,
   Alert,
   StyleSheet,
-  Switch,
   Text,
   TextInput,
   TouchableOpacity,
@@ -19,8 +18,6 @@ export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [cargando, setCargando] = useState(false);
-  const [recordarSesion, setRecordarSesion] = useState(true);
-
   const { iniciarSesion } = useAuth();
   const router = useRouter();
 
@@ -30,12 +27,40 @@ export default function LoginScreen() {
       return;
     }
     setCargando(true);
-    const resultado = await iniciarSesion(email, password, recordarSesion);
+    const resultado = await iniciarSesion(email, password, true);
     setCargando(false);
-
     if (resultado.success) {
-      // El layout raíz se encargará de redirigir según el rol
-      router.replace("/"); // Redirige a la raíz para que el layout maneje la navegación
+      router.replace("/");
+    } else {
+      Alert.alert("Error", resultado.error || "No se pudo iniciar sesión");
+    }
+  };
+
+  const handleIngresarComoUsuario = async () => {
+    if (!email || !password) {
+      Alert.alert("Error", "Por favor completa todos los campos");
+      return;
+    }
+    setCargando(true);
+    const resultado = await iniciarSesion(email, password, true);
+    setCargando(false);
+    if (resultado.success) {
+      router.replace("/");
+    } else {
+      Alert.alert("Error", resultado.error || "No se pudo iniciar sesión");
+    }
+  };
+
+  const handleIngresarComoAsesor = async () => {
+    if (!email || !password) {
+      Alert.alert("Error", "Por favor completa todos los campos");
+      return;
+    }
+    setCargando(true);
+    const resultado = await iniciarSesion(email, password, true);
+    setCargando(false);
+    if (resultado.success) {
+      router.replace("/");
     } else {
       Alert.alert("Error", resultado.error || "No se pudo iniciar sesión");
     }
@@ -44,8 +69,7 @@ export default function LoginScreen() {
   return (
     <View style={globalStyles.container}>
       <View style={globalStyles.contentPadding}>
-        <Text style={styles.titulo}>Tigo Conecta</Text>
-        <Text style={styles.subtitulo}>Inicia sesión para continuar</Text>
+        <Text style={styles.titulo}>Iniciar Sesión</Text>
         <TextInput
           style={globalStyles.input}
           placeholder="Email"
@@ -61,46 +85,44 @@ export default function LoginScreen() {
           onChangeText={setPassword}
           secureTextEntry
         />
-        <View style={styles.recordarSesionContainer}>
-          <Switch
-            value={recordarSesion}
-            onValueChange={setRecordarSesion}
-            trackColor={{ false: colors.border, true: colors.primary }}
-            thumbColor={recordarSesion ? colors.white : colors.white}
-          />
-          <Text style={styles.recordarSesionTexto}>Recordar sesión</Text>
-        </View>
         <TouchableOpacity
           style={[
             globalStyles.button,
             globalStyles.buttonPrimary,
             styles.botonLogin,
           ]}
-          onPress={handleLogin}
+          onPress={handleIngresarComoUsuario}
           disabled={cargando}
         >
           {cargando ? (
             <ActivityIndicator color={colors.white} />
           ) : (
-            <Text style={globalStyles.buttonText}>Iniciar Sesión</Text>
+            <Text style={globalStyles.buttonText}>Ingresar como Usuario</Text>
           )}
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => router.push("/auth/registro")}>
-          <Text style={styles.linkRegistro}>
-            ¿No tienes cuenta? Regístrate aquí
-          </Text>
+        <TouchableOpacity
+          style={[
+            globalStyles.button,
+            globalStyles.buttonSecondary,
+            styles.botonAsesor,
+          ]}
+          onPress={handleIngresarComoAsesor}
+          disabled={cargando}
+        >
+          {cargando ? (
+            <ActivityIndicator color={colors.white} />
+          ) : (
+            <Text style={globalStyles.buttonText}>Ingresar como Asesor</Text>
+          )}
         </TouchableOpacity>
         <TouchableOpacity onPress={() => router.push("/auth/reestablecer")}>
-          <Text style={styles.linkRegistro}>
-            ¿Olvidaste tu contraseña?
-          </Text>
+          <Text style={styles.linkRecuperar}>¿Olvidaste tu contraseña?</Text>
         </TouchableOpacity>
       </View>
     </View>
   );
 }
 
-// ... (mismos estilos que antes)
 const styles = StyleSheet.create({
   titulo: {
     fontSize: fontSize.xxxl,
@@ -110,30 +132,17 @@ const styles = StyleSheet.create({
     marginTop: spacing.xxl * 2,
     color: colors.textPrimary,
   },
-  subtitulo: {
-    fontSize: fontSize.md,
-    textAlign: "center",
-    marginBottom: spacing.xl,
-    color: colors.textSecondary,
-  },
   botonLogin: {
     marginTop: spacing.sm,
   },
-  linkRegistro: {
+  botonAsesor: {
+    marginTop: spacing.sm,
+    backgroundColor: colors.secondary,
+  },
+  linkRecuperar: {
     textAlign: "center",
     marginTop: spacing.lg,
     color: colors.primary,
     fontSize: fontSize.sm,
-  },
-  recordarSesionContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: spacing.md,
-    marginBottom: spacing.sm,
-  },
-  recordarSesionTexto: {
-    marginLeft: spacing.sm,
-    fontSize: fontSize.md,
-    color: colors.textPrimary,
   },
 });

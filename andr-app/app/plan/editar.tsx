@@ -1,4 +1,4 @@
-// app/plan/editar.tsx (Editar plan - Solo propietario)
+// app/plan/editar.tsx
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
@@ -27,7 +27,6 @@ export default function EditarPlanScreen() {
   const [plan, setPlan] = useState<Plan | null>(null);
   const [cargando, setCargando] = useState(true);
   const [cargandoGuardado, setCargandoGuardado] = useState(false);
-
   const [nombre, setNombre] = useState("");
   const [precio, setPrecio] = useState("");
   const [segmento, setSegmento] = useState("");
@@ -135,7 +134,6 @@ export default function EditarPlanScreen() {
      );
   }
 
-  // Validar propietario
   if (plan.asesor_id !== usuario?.id) {
     return (
       <View style={globalStyles.containerCentered}>
@@ -171,7 +169,6 @@ export default function EditarPlanScreen() {
         <TextInput style={globalStyles.input} placeholder="WhatsApp" value={whatsapp} onChangeText={setWhatsapp} />
         <TextInput style={globalStyles.input} placeholder="Llamadas Internacionales" value={llamadasInternacionales} onChangeText={setLlamadasInternacionales} />
         <TextInput style={globalStyles.input} placeholder="Roaming" value={roaming} onChangeText={setRoaming} />
-
         <TouchableOpacity
           style={[
             globalStyles.button,

@@ -3,7 +3,7 @@ export interface Contratacion {
   id: string;
   usuario_id: string;
   plan_id: string;
-  fecha_contratacion: string; // ISO Date String
+  fecha_contratacion: string;
   estado: "pendiente" | "aprobada" | "rechazada";
   observaciones?: string;
   created_at: string;

@@ -1,4 +1,4 @@
-// app/(tabs)/index.tsx (Pantalla principal según rol)
+// app/(tabs)/index.tsx
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -23,8 +23,8 @@ import {
 
 export default function HomeScreen() {
   const { usuario, esUsuarioRegistrado, esAsesorComercial, cerrarSesion } = useAuth();
-  const { planes, cargarPlanesPublicos, cargarPlanesAsesor } = usePlanes(); // Reutilizar hook de planes
-  const { cargarContratacionesUsuario } = useContrataciones(); // Reutilizar hook de contrataciones
+  const { planes, cargarPlanesPublicos, cargarPlanesAsesor } = usePlanes();
+  const { cargarContratacionesUsuario } = useContrataciones();
   const [cargando, setCargando] = useState(true);
   const [refrescando, setRefrescando] = useState(false);
   const router = useRouter();
@@ -33,10 +33,9 @@ export default function HomeScreen() {
     const cargarDatos = async () => {
       setCargando(true);
       if (esAsesorComercial && usuario?.id) {
-        await cargarPlanesAsesor(usuario.id); // Cargar planes del asesor
-      } else if (esUsuarioRegistrado && usuario?.id) {
-        await cargarPlanesPublicos(); // Cargar planes públicos
-        // await cargarContratacionesUsuario(usuario.id); // Opcional para mostrar últimas contrataciones
+        await cargarPlanesAsesor(usuario.id);
+      } else if (esUsuarioRegistrado) {
+        await cargarPlanesPublicos();
       }
       setCargando(false);
     };
@@ -65,54 +64,6 @@ export default function HomeScreen() {
     }
     setRefrescando(false);
   };
-
-  const mostrarContenidoAsesor = () => (
-    <>
-      <Text style={styles.sectionTitle}>Tus Planes</Text>
-      {planes.length === 0 ? (
-        <Text style={globalStyles.emptyState}>No tienes planes creados</Text>
-      ) : (
-        <FlatList
-          data={planes.slice(0, 3)} // Mostrar solo las 3 primeras
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ gap: spacing.md }}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={[globalStyles.card, styles.rutinaCard]}
-              onPress={() => router.push(`/plan/editar?id=${item.id}`)} // Ruta para editar plan
-            >
-              <Text style={styles.tituloReceta}>{item.nombre_comercial}</Text>
-              <Text style={globalStyles.textSecondary} numberOfLines={2}>
-                ${item.precio}/mes
-              </Text>
-            </TouchableOpacity>
-          )}
-          keyExtractor={(item) => item.id}
-        />
-      )}
-      <TouchableOpacity
-        style={[globalStyles.button, globalStyles.buttonSecondary, styles.verMasButton]}
-        onPress={() => router.push("/(tabs)/misPlanes")} // Asumiendo que misPlanes ahora muestra planes del asesor
-      >
-        <Text style={globalStyles.buttonText}>Ver todos los planes</Text>
-      </TouchableOpacity>
-    </>
-  );
-
-  const mostrarContenidoUsuario = () => (
-    <View style={globalStyles.containerCentered}>
-      <Text style={styles.saludo}>¡Hola, {usuario.nombre || usuario.email}!</Text>
-      <Text style={globalStyles.textSecondary}>Bienvenido a Tigo Conecta.</Text>
-      <Text style={globalStyles.textSecondary}>Revisa nuestro catálogo de planes.</Text>
-      <TouchableOpacity
-        style={[globalStyles.button, globalStyles.buttonPrimary, { marginTop: spacing.lg }]}
-        onPress={() => router.push("/(tabs)/misPlanes")} // Asumiendo que misPlanes ahora muestra planes públicos
-      >
-        <Text style={globalStyles.buttonText}>Ver Catálogo</Text>
-      </TouchableOpacity>
-    </View>
-  );
 
   if (cargando) {
     return (
@@ -145,7 +96,39 @@ export default function HomeScreen() {
       </View>
       <FlatList
         data={[]}
-        ListHeaderComponent={esAsesorComercial ? mostrarContenidoAsesor : mostrarContenidoUsuario}
+        ListHeaderComponent={
+          <>
+            <Text style={styles.sectionTitle}>Planes Disponibles</Text>
+            {planes.length === 0 ? (
+              <Text style={globalStyles.emptyState}>No hay planes disponibles</Text>
+            ) : (
+              <FlatList
+                data={planes.slice(0, 3)}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{ gap: spacing.md }}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={[globalStyles.card, styles.rutinaCard]}
+                    onPress={() => router.push(`/detallePlan?id=${item.id}`)}
+                  >
+                    <Text style={styles.tituloReceta}>{item.nombre_comercial}</Text>
+                    <Text style={globalStyles.textSecondary} numberOfLines={2}>
+                      ${item.precio}/mes
+                    </Text>
+                  </TouchableOpacity>
+                )}
+                keyExtractor={(item) => item.id}
+              />
+            )}
+            <TouchableOpacity
+              style={[globalStyles.button, globalStyles.buttonSecondary, styles.verMasButton]}
+              onPress={() => router.push("/(tabs)/misPlanes")}
+            >
+              <Text style={globalStyles.buttonText}>Ver todos los planes</Text>
+            </TouchableOpacity>
+          </>
+        }
         contentContainerStyle={{ padding: spacing.md }}
         refreshControl={
           <RefreshControl
@@ -153,8 +136,8 @@ export default function HomeScreen() {
             onRefresh={handleRefresh}
           />
         }
-        renderItem={() => null} // No renderiza items de la lista, solo el header
-        keyExtractor={() => "header"} // Clave única para el header
+        renderItem={() => null}
+        keyExtractor={() => "header"}
       />
     </View>
   );

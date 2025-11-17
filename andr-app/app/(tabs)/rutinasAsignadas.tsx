@@ -1,4 +1,4 @@
-// app/(tabs)/rutinasAsignadas.tsx (Ahora Mis Contrataciones para Usuario)
+// app/(tabs)/rutinasAsignadas.tsx
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
@@ -106,6 +106,12 @@ export default function RutinasAsignadasScreen() {
             {item.observaciones && (
               <Text style={globalStyles.textSecondary}>Observaciones: {item.observaciones}</Text>
             )}
+            <TouchableOpacity
+              style={[globalStyles.button, globalStyles.buttonPrimary, styles.botonChat]}
+              onPress={() => router.push("/(tabs)/chat")}
+            >
+              <Text style={globalStyles.buttonText}>Chat con Asesor</Text>
+            </TouchableOpacity>
           </View>
         )}
       />
@@ -126,5 +132,9 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: colors.textPrimary,
     marginBottom: spacing.xs,
+  },
+  botonChat: {
+    marginTop: spacing.sm,
+    paddingVertical: spacing.sm,
   },
 });
