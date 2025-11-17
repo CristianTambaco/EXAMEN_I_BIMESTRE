@@ -1,6 +1,6 @@
-// app/(tabs)/rutinasAsignadas.tsx (Solo para usuarios)
+// app/(tabs)/rutinasAsignadas.tsx (Ahora Mis Contrataciones para Usuario)
 import { useRouter } from "expo-router";
-import React, { useEffect, useState } from "react"; // 
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -11,7 +11,7 @@ import {
   View,
 } from "react-native";
 import { useAuth } from "../../src/presentation/hooks/useAuth";
-import { useRutinas } from "../../src/presentation/hooks/useRutinas";
+import { useContrataciones } from "../../src/presentation/hooks/useContrataciones";
 import { globalStyles } from "../../src/styles/globalStyles";
 import {
   colors,
@@ -20,22 +20,31 @@ import {
 } from "../../src/styles/theme";
 
 export default function RutinasAsignadasScreen() {
-  const { usuario, esEntrenador: esEntrenador } = useAuth(); // Renombrar para claridad
-  const { rutinas, cargando, cargarRutinasAsignadas } = useRutinas();
+  const { usuario, esUsuarioRegistrado, esAsesorComercial } = useAuth();
+  const { cargarContratacionesUsuario } = useContrataciones();
+  const [contrataciones, setContrataciones] = useState<any[]>([]);
+  const [cargando, setCargando] = useState(true);
   const [refrescando, setRefrescando] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    if (!esEntrenador && usuario?.id) { // Solo si es usuario
-      cargarRutinasAsignadas(usuario.id);
+    if (esUsuarioRegistrado && usuario?.id) {
+      cargarDatos(usuario.id);
     }
-  }, [esEntrenador, usuario?.id]);
+  }, [esUsuarioRegistrado, usuario?.id]);
 
-  if (esEntrenador) { // Si es entrenador, redirigir o mostrar mensaje
+  const cargarDatos = async (userId: string) => {
+    setCargando(true);
+    const data = await cargarContratacionesUsuario(userId);
+    setContrataciones(data);
+    setCargando(false);
+  };
+
+  if (esAsesorComercial) {
     return (
       <View style={globalStyles.containerCentered}>
         <Text style={styles.textoNoUsuario}>
-          Esta sección es solo para usuarios 🏃‍♂️
+          Esta sección es solo para usuarios registrados 📱
         </Text>
       </View>
     );
@@ -44,7 +53,7 @@ export default function RutinasAsignadasScreen() {
   const handleRefresh = async () => {
     setRefrescando(true);
     if (usuario?.id) {
-      await cargarRutinasAsignadas(usuario.id);
+      await cargarDatos(usuario.id);
     }
     setRefrescando(false);
   };
@@ -57,11 +66,25 @@ export default function RutinasAsignadasScreen() {
     );
   }
 
+  const renderEstado = (estado: string) => {
+    let color = colors.warning;
+    if (estado === 'aprobada') {
+      color = colors.success;
+    } else if (estado === 'rechazada') {
+      color = colors.danger;
+    }
+    return (
+      <Text style={[globalStyles.textSecondary, { color, fontWeight: '600' }]}>
+        {estado}
+      </Text>
+    );
+  };
+
   return (
     <View style={globalStyles.container}>
-      <Text style={globalStyles.title}>Rutinas Asignadas</Text>
+      <Text style={globalStyles.title}>Mis Contrataciones</Text>
       <FlatList
-        data={rutinas}
+        data={contrataciones}
         keyExtractor={(item) => item.id}
         contentContainerStyle={{ padding: spacing.md }}
         refreshControl={
@@ -72,32 +95,18 @@ export default function RutinasAsignadasScreen() {
         }
         ListEmptyComponent={
           <Text style={globalStyles.emptyState}>
-            No tienes rutinas asignadas
+            No tienes contrataciones
           </Text>
         }
         renderItem={({ item }) => (
-          <TouchableOpacity
-            style={globalStyles.card}
-            onPress={() => router.push({ // 👈 CORRECCIÓN AQUÍ
-              pathname: '/rutina/[id]/ver', // Ruta definida en los archivos
-              params: { id: item.id }, // Parámetro dinámico
-            })}
-          >
-            <Text style={styles.tituloRutina}>{item.titulo}</Text>
-            <Text style={globalStyles.textSecondary} numberOfLines={2}>
-              {item.descripcion}
-            </Text>
-            <TouchableOpacity
-              style={[
-                globalStyles.button,
-                globalStyles.buttonSecondary,
-                { marginTop: spacing.sm }
-              ]}
-              onPress={() => router.push(`/progreso/registrar?rutinaId=${item.id}`)} // Opción para registrar progreso por rutina
-            >
-              <Text style={globalStyles.buttonText}>Registrar Progreso</Text>
-            </TouchableOpacity>
-          </TouchableOpacity>
+          <View style={globalStyles.card}>
+            <Text style={styles.tituloPlan}>{item.planes_moviles.nombre_comercial}</Text>
+            <Text style={globalStyles.textSecondary}>Estado: {renderEstado(item.estado)}</Text>
+            <Text style={globalStyles.textSecondary}>Fecha: {new Date(item.fecha_contratacion).toLocaleDateString('es-ES')}</Text>
+            {item.observaciones && (
+              <Text style={globalStyles.textSecondary}>Observaciones: {item.observaciones}</Text>
+            )}
+          </View>
         )}
       />
     </View>
@@ -112,7 +121,7 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     marginBottom: spacing.sm,
   },
-  tituloRutina: {
+  tituloPlan: {
     fontSize: fontSize.lg,
     fontWeight: "bold",
     color: colors.textPrimary,

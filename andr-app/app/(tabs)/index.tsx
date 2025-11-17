@@ -5,48 +5,43 @@ import {
   ActivityIndicator,
   Alert,
   FlatList,
-  Image,
   RefreshControl,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
 import { useAuth } from "../../src/presentation/hooks/useAuth";
-import { useRutinas } from "../../src/presentation/hooks/useRutinas";
 import { usePlanes } from "../../src/presentation/hooks/usePlanes";
+import { useContrataciones } from "../../src/presentation/hooks/useContrataciones";
 import { globalStyles } from "../../src/styles/globalStyles";
 import {
-  borderRadius,
   colors,
   fontSize,
   spacing,
 } from "../../src/styles/theme";
 
 export default function HomeScreen() {
-  const { usuario, cerrarSesion } = useAuth();
-  const { rutinas: rutinasEntrenador, cargarRutinas } = useRutinas();
-  const { planes: planesEntrenador, cargarPlanes } = usePlanes();
+  const { usuario, esUsuarioRegistrado, esAsesorComercial, cerrarSesion } = useAuth();
+  const { planes, cargarPlanesPublicos, cargarPlanesAsesor } = usePlanes(); // Reutilizar hook de planes
+  const { cargarContratacionesUsuario } = useContrataciones(); // Reutilizar hook de contrataciones
   const [cargando, setCargando] = useState(true);
   const [refrescando, setRefrescando] = useState(false);
-
   const router = useRouter();
 
   React.useEffect(() => {
     const cargarDatos = async () => {
       setCargando(true);
-      if (usuario?.rol === "entrenador") {
-        await Promise.all([
-          cargarRutinas(usuario.id),
-          cargarPlanes(usuario.id)
-        ]);
+      if (esAsesorComercial && usuario?.id) {
+        await cargarPlanesAsesor(usuario.id); // Cargar planes del asesor
+      } else if (esUsuarioRegistrado && usuario?.id) {
+        await cargarPlanesPublicos(); // Cargar planes públicos
+        // await cargarContratacionesUsuario(usuario.id); // Opcional para mostrar últimas contrataciones
       }
-      // Para usuario, no hay nada específico en Home, podría redirigir o mostrar mensaje
       setCargando(false);
     };
     cargarDatos();
-  }, [usuario, cargarRutinas, cargarPlanes]);
+  }, [usuario, esAsesorComercial, esUsuarioRegistrado, cargarPlanesAsesor, cargarPlanesPublicos]);
 
   const handleCerrarSesion = async () => {
     await cerrarSesion();
@@ -63,64 +58,33 @@ export default function HomeScreen() {
 
   const handleRefresh = async () => {
     setRefrescando(true);
-    if (usuario.rol === "entrenador") {
-      await Promise.all([
-        cargarRutinas(usuario.id),
-        cargarPlanes(usuario.id)
-      ]);
+    if (esAsesorComercial && usuario?.id) {
+      await cargarPlanesAsesor(usuario.id);
+    } else if (esUsuarioRegistrado) {
+      await cargarPlanesPublicos();
     }
     setRefrescando(false);
   };
 
-  const mostrarContenidoEntrenador = () => (
+  const mostrarContenidoAsesor = () => (
     <>
-      <Text style={styles.sectionTitle}>Tus Rutinas</Text>
-      {rutinasEntrenador.length === 0 ? (
-        <Text style={globalStyles.emptyState}>No tienes rutinas creadas</Text>
-      ) : (
-        <FlatList
-          data={rutinasEntrenador.slice(0, 3)} // Mostrar solo las 3 primeras
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ gap: spacing.md }}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={[globalStyles.card, styles.rutinaCard]}
-              onPress={() => router.push(`/rutina/editar?id=${item.id}`)}
-            >
-              <Text style={styles.tituloReceta}>{item.titulo}</Text>
-              <Text style={globalStyles.textSecondary} numberOfLines={2}>
-                {item.descripcion}
-              </Text>
-            </TouchableOpacity>
-          )}
-          keyExtractor={(item) => item.id}
-        />
-      )}
-      <TouchableOpacity
-        style={[globalStyles.button, globalStyles.buttonSecondary, styles.verMasButton]}
-        onPress={() => router.push("/(tabs)/misRutinas")}
-      >
-        <Text style={globalStyles.buttonText}>Ver todas las rutinas</Text>
-      </TouchableOpacity>
-
       <Text style={styles.sectionTitle}>Tus Planes</Text>
-      {planesEntrenador.length === 0 ? (
+      {planes.length === 0 ? (
         <Text style={globalStyles.emptyState}>No tienes planes creados</Text>
       ) : (
         <FlatList
-          data={planesEntrenador.slice(0, 3)} // Mostrar solo las 3 primeras
+          data={planes.slice(0, 3)} // Mostrar solo las 3 primeras
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{ gap: spacing.md }}
           renderItem={({ item }) => (
             <TouchableOpacity
               style={[globalStyles.card, styles.rutinaCard]}
-              onPress={() => router.push(`/plan/editar?id=${item.id}`)}
+              onPress={() => router.push(`/plan/editar?id=${item.id}`)} // Ruta para editar plan
             >
-              <Text style={styles.tituloReceta}>{item.nombre}</Text>
+              <Text style={styles.tituloReceta}>{item.nombre_comercial}</Text>
               <Text style={globalStyles.textSecondary} numberOfLines={2}>
-                {item.descripcion}
+                ${item.precio}/mes
               </Text>
             </TouchableOpacity>
           )}
@@ -129,7 +93,7 @@ export default function HomeScreen() {
       )}
       <TouchableOpacity
         style={[globalStyles.button, globalStyles.buttonSecondary, styles.verMasButton]}
-        onPress={() => router.push("/(tabs)/misPlanes")}
+        onPress={() => router.push("/(tabs)/misPlanes")} // Asumiendo que misPlanes ahora muestra planes del asesor
       >
         <Text style={globalStyles.buttonText}>Ver todos los planes</Text>
       </TouchableOpacity>
@@ -139,19 +103,13 @@ export default function HomeScreen() {
   const mostrarContenidoUsuario = () => (
     <View style={globalStyles.containerCentered}>
       <Text style={styles.saludo}>¡Hola, {usuario.nombre || usuario.email}!</Text>
-      <Text style={globalStyles.textSecondary}>Bienvenido a tu panel de usuario.</Text>
-      <Text style={globalStyles.textSecondary}>Revisa tus rutinas asignadas o registra tu progreso.</Text>
+      <Text style={globalStyles.textSecondary}>Bienvenido a Tigo Conecta.</Text>
+      <Text style={globalStyles.textSecondary}>Revisa nuestro catálogo de planes.</Text>
       <TouchableOpacity
         style={[globalStyles.button, globalStyles.buttonPrimary, { marginTop: spacing.lg }]}
-        onPress={() => router.push("/(tabs)/rutinasAsignadas")}
+        onPress={() => router.push("/(tabs)/misPlanes")} // Asumiendo que misPlanes ahora muestra planes públicos
       >
-        <Text style={globalStyles.buttonText}>Ver Rutinas Asignadas</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={[globalStyles.button, globalStyles.buttonSecondary, { marginTop: spacing.sm }]}
-        onPress={() => router.push("/(tabs)/progreso")}
-      >
-        <Text style={globalStyles.buttonText}>Mi Progreso</Text>
+        <Text style={globalStyles.buttonText}>Ver Catálogo</Text>
       </TouchableOpacity>
     </View>
   );
@@ -171,10 +129,7 @@ export default function HomeScreen() {
           <Text style={styles.saludo}>¡Hola!</Text>
           <Text style={globalStyles.textSecondary}>{usuario.email}</Text>
           <Text style={styles.rol}>
-            {usuario.rol === "entrenador" ? "🏋️‍♂️ Entrenador" : "🏃‍♂️ Usuario"}
-            {/* {usuario.rol === "entrenador" ? "🏃‍♂️ Usuario" : "🏋️‍♂️ Entrenador" } */}
-
-
+            {esAsesorComercial ? "💼 Asesor Comercial" : "📱 Usuario Registrado"}
           </Text>
         </View>
         <TouchableOpacity
@@ -190,7 +145,7 @@ export default function HomeScreen() {
       </View>
       <FlatList
         data={[]}
-        ListHeaderComponent={usuario?.rol === "entrenador" ? mostrarContenidoEntrenador : mostrarContenidoUsuario}
+        ListHeaderComponent={esAsesorComercial ? mostrarContenidoAsesor : mostrarContenidoUsuario}
         contentContainerStyle={{ padding: spacing.md }}
         refreshControl={
           <RefreshControl
@@ -198,11 +153,6 @@ export default function HomeScreen() {
             onRefresh={handleRefresh}
           />
         }
-        // ListEmptyComponent={
-        //   <Text style={globalStyles.emptyState}>
-        //     No hay datos disponibles
-        //   </Text>
-        // }
         renderItem={() => null} // No renderiza items de la lista, solo el header
         keyExtractor={() => "header"} // Clave única para el header
       />

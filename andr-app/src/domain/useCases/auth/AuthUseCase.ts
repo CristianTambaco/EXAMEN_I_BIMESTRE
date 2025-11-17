@@ -1,6 +1,8 @@
+// src/domain/useCases/auth/AuthUseCase.ts
+
 import { supabase } from "@/src/data/services/supabaseClient";
 import { StorageService } from "../../../data/services/storageService";
-import { Usuario } from "../../models/Usuario";
+import { Usuario } from "../../models/Usuario"; // 👈 Asegúrate de importar el modelo correcto
 
 /**
  * AuthUseCase - Caso de Uso de Autenticación
@@ -22,25 +24,20 @@ export class AuthUseCase {
    *
    * @param email - Email del usuario
    * @param password - Contraseña (mínimo 6 caracteres)
-   * @param rol - Tipo de usuario: "entrenador" o "usuario"
+   * @param rol - Tipo de usuario: "asesor_comercial" o "usuario_registrado"
    * @returns Objeto con success y datos o error
    */
-  async registrar(email: string, password: string, rol: "entrenador" | "usuario") {
+  async registrar(email: string, password: string, rol: "asesor_comercial" | "usuario_registrado") {
     try {
       // PASO 1: Crear usuario en Supabase Auth
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password,
       });
-
-      // Verificar si hubo error
       if (authError) throw authError;
       if (!authData.user) throw new Error("No se pudo crear el usuario");
 
-      // PASO 2: Esperar confirmación de sesión activa
-      // Si el usuario requiere confirmación de email, esperamos
       if (!authData.session) {
-        // Usuario creado pero necesita confirmar email
         return {
           success: true,
           user: authData.user,
@@ -50,18 +47,16 @@ export class AuthUseCase {
       }
 
       // PASO 3: Guardar información adicional en tabla usuarios
-      // SOLO si la sesión está activa (usuario autenticado)
       const { error: upsertError } = await supabase.from("usuarios").upsert(
         {
-          id: authData.user.id, // Mismo ID que en Auth
+          id: authData.user.id,
           email: authData.user.email,
-          rol: rol, // Entrenador o usuario
+          rol: rol,
         },
         {
-          onConflict: "id", // Si el ID ya existe, actualiza
+          onConflict: "id",
         }
       );
-
       if (upsertError) throw upsertError;
 
       return { success: true, user: authData.user };
@@ -78,7 +73,7 @@ export class AuthUseCase {
    * @param rol - Rol del usuario
    * @returns Resultado de la operación
    */
-  async crearPerfil(userId: string, email: string, rol: "entrenador" | "usuario") {
+  async crearPerfil(userId: string, email: string, rol: "asesor_comercial" | "usuario_registrado") {
     try {
       const { error } = await supabase.from("usuarios").upsert(
         {
@@ -166,22 +161,19 @@ export class AuthUseCase {
    */
   async obtenerUsuarioActual(): Promise<Usuario | null> {
     try {
-      // PASO 1: Obtener usuario de Auth
       const {
         data: { user },
       } = await supabase.auth.getUser();
-
       if (!user) return null;
 
-      // PASO 2: Obtener información completa de tabla usuarios
       const { data, error } = await supabase
-        .from("usuarios")
+        .from("usuarios") // Tabla 'usuarios'
         .select("*")
         .eq("id", user.id)
-        .single(); // Esperamos un solo resultado
+        .single();
 
       if (error) throw error;
-      return data as Usuario;
+      return data as Usuario; // El tipo ya está actualizado
     } catch (error) {
       console.log("Error al obtener usuario:", error);
       return null;
@@ -247,10 +239,10 @@ export class AuthUseCase {
           console.log("Usuario autenticado pero sin perfil...");
 
           // Verificar si hay un rol pendiente guardado
-          let rolPendiente: "entrenador" | "usuario" = "usuario"; // Por defecto
+          let rolPendiente: "asesor_comercial" | "usuario_registrado" = "usuario_registrado"; // Por defecto
 
           const rolGuardado = await StorageService.getItem("pending_user_role");
-          if (rolGuardado === "entrenador" || rolGuardado === "usuario") {
+          if (rolGuardado === "asesor_comercial" || rolGuardado === "usuario_registrado") {
             rolPendiente = rolGuardado;
           }
 

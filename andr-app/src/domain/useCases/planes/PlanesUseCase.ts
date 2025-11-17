@@ -1,101 +1,64 @@
 // src/domain/useCases/planes/PlanesUseCase.ts
 import { supabase } from "@/src/data/services/supabaseClient";
-import { PlanEntrenamiento } from "../../models/PlanEntrenamiento";
-import { Rutina } from "../../models/Rutina";
+import { Plan } from "../../models/Plan";
 
 export class PlanesUseCase {
-  async obtenerPlanesPorEntrenador(entrenadorId: string): Promise<PlanEntrenamiento[]> {
+  async obtenerPlanesActivos(): Promise<Plan[]> {
     try {
       const { data, error } = await supabase
-        .from("planes_entrenamiento")
+        .from("planes_moviles") // Asumiendo nombre de tabla en Supabase
         .select("*")
-        .eq("entrenador_id", entrenadorId)
+        .eq("activo", true)
         .order("created_at", { ascending: false });
-
       if (error) throw error;
-      return data as PlanEntrenamiento[];
+      return data as Plan[];
     } catch (error) {
-      console.error("Error al obtener planes por entrenador:", error);
+      console.error("Error al obtener planes activos:", error);
       return [];
     }
   }
 
-  async obtenerPlanesAsignadosAUsuario(usuarioId: string): Promise<PlanEntrenamiento[]> {
+  async obtenerPlanesPorAsesor(asesorId: string): Promise<Plan[]> {
     try {
       const { data, error } = await supabase
-        .from("planes_entrenamiento")
-        .select(`
-          *,
-          usuario_plan!inner(usuario_id)
-        `)
-        .eq("usuario_plan.usuario_id", usuarioId);
-
+        .from("planes_moviles")
+        .select("*")
+        .eq("asesor_id", asesorId)
+        .order("created_at", { ascending: false });
       if (error) throw error;
-      return data as PlanEntrenamiento[];
+      return data as Plan[];
     } catch (error) {
-      console.error("Error al obtener planes asignados:", error);
+      console.error("Error al obtener planes del asesor:", error);
       return [];
     }
   }
 
   async crearPlan(
-    nombre: string,
-    descripcion: string,
-    entrenadorId: string,
-    rutinasIds: string[] // Array de IDs de rutinas a incluir
-  ): Promise<{ success: boolean; error?: string; plan?: PlanEntrenamiento }> {
+    planData: Omit<Plan, 'id' | 'created_at' | 'updated_at' | 'activo'>
+  ): Promise<{ success: boolean; error?: string; plan?: Plan }> {
     try {
       const { data, error } = await supabase
-        .from("planes_entrenamiento")
-        .insert({ nombre, descripcion, entrenador_id: entrenadorId })
+        .from("planes_moviles")
+        .insert([planData])
         .select()
         .single();
-
       if (error) throw error;
-
-      if (rutinasIds && rutinasIds.length > 0) {
-        const planRutinas = rutinasIds.map((id, index) => ({
-          plan_id: data.id,
-          rutina_id: id,
-          orden: index + 1
-        }));
-        const { error: planRutinaError } = await supabase.from('plan_rutina').insert(planRutinas);
-        if (planRutinaError) throw planRutinaError;
-      }
-
-      return { success: true, plan: data as PlanEntrenamiento };
+      return { success: true, plan: data as Plan };
     } catch (error: any) {
       return { success: false, error: error.message };
     }
   }
 
-  async actualizarPlan(id: string, nombre: string, descripcion: string, rutinasIds: string[]): Promise<{ success: boolean; error?: string; plan?: PlanEntrenamiento }> {
+  async actualizarPlan(id: string, planData: Partial<Omit<Plan, 'id' | 'created_at' | 'updated_at'>>): Promise<{ success: boolean; error?: string; plan?: Plan }> {
     try {
-      // Actualizar plan
       const { data, error } = await supabase
-        .from("planes_entrenamiento")
-        .update({ nombre, descripcion })
+        .from("planes_moviles")
+        .update(planData)
         .eq("id", id)
         .select()
         .single();
-
       if (error) throw error;
-
-      // Eliminar relaciones actuales
-      await supabase.from('plan_rutina').delete().eq('plan_id', id);
-
-      // Insertar nuevas relaciones
-      if (rutinasIds && rutinasIds.length > 0) {
-        const planRutinas = rutinasIds.map((id, index) => ({
-          plan_id: data.id,
-          rutina_id: id,
-          orden: index + 1
-        }));
-        const { error: planRutinaError } = await supabase.from('plan_rutina').insert(planRutinas);
-        if (planRutinaError) throw planRutinaError;
-      }
-
-      return { success: true, plan: data as PlanEntrenamiento };
+      return { success: true, plan: data as Plan };
     } catch (error: any) {
       return { success: false, error: error.message };
     }
@@ -103,37 +66,14 @@ export class PlanesUseCase {
 
   async eliminarPlan(id: string): Promise<{ success: boolean; error?: string }> {
     try {
+      // Opción 1: Eliminar permanentemente (no recomendada)
+      // const { error } = await supabase.from("planes_moviles").delete().eq("id", id);
+
+      // Opción 2: Marcar como inactivo (recomendada)
       const { error } = await supabase
-        .from("planes_entrenamiento")
-        .delete()
+        .from("planes_moviles")
+        .update({ activo: false })
         .eq("id", id);
-
-      if (error) throw error;
-      return { success: true };
-    } catch (error: any) {
-      return { success: false, error: error.message };
-    }
-  }
-
-  async asignarPlanAUsuario(planId: string, usuarioId: string): Promise<{ success: boolean; error?: string }> {
-    try {
-      const { error } = await supabase
-        .from("usuario_plan")
-        .insert({ plan_id: planId, usuario_id: usuarioId });
-
-      if (error) throw error;
-      return { success: true };
-    } catch (error: any) {
-      return { success: false, error: error.message };
-    }
-  }
-
-  async desasignarPlanAUsuario(planId: string, usuarioId: string): Promise<{ success: boolean; error?: string }> {
-    try {
-      const { error } = await supabase
-        .from("usuario_plan")
-        .delete()
-        .match({ plan_id: planId, usuario_id: usuarioId });
 
       if (error) throw error;
       return { success: true };

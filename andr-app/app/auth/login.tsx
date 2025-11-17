@@ -1,3 +1,4 @@
+// app/auth/login.tsx
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -15,38 +16,27 @@ import { globalStyles } from "../../src/styles/globalStyles";
 import { colors, fontSize, spacing } from "../../src/styles/theme";
 
 export default function LoginScreen() {
-  // ESTADO LOCAL 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [cargando, setCargando] = useState(false);
   const [recordarSesion, setRecordarSesion] = useState(true);
 
-  // HOOKS 
   const { iniciarSesion } = useAuth();
   const router = useRouter();
 
-  /**
-   * Manejar inicio de sesión 
-   */
   const handleLogin = async () => {
-    // VALIDACIÓN: Campos vacíos
     if (!email || !password) {
       Alert.alert("Error", "Por favor completa todos los campos");
       return;
     }
-
-    // INICIO DE SESIÓN
     setCargando(true);
     const resultado = await iniciarSesion(email, password, recordarSesion);
     setCargando(false);
 
-    // MANEJO DE RESULTADO
     if (resultado.success) {
-      // Éxito: Redirigir a tabs
-      // replace() para que no pueda volver con botón atrás
-      router.replace("/(tabs)");
+      // El layout raíz se encargará de redirigir según el rol
+      router.replace("/"); // Redirige a la raíz para que el layout maneje la navegación
     } else {
-      // Error: Mostrar mensaje
       Alert.alert("Error", resultado.error || "No se pudo iniciar sesión");
     }
   };
@@ -54,27 +44,23 @@ export default function LoginScreen() {
   return (
     <View style={globalStyles.container}>
       <View style={globalStyles.contentPadding}>
-        <Text style={styles.titulo}>Rutinas App</Text>
+        <Text style={styles.titulo}>Tigo Conecta</Text>
         <Text style={styles.subtitulo}>Inicia sesión para continuar</Text>
-
         <TextInput
           style={globalStyles.input}
           placeholder="Email"
           value={email}
           onChangeText={setEmail}
-          autoCapitalize="none" // No capitalizar
-          keyboardType="email-address" // Teclado de email
+          autoCapitalize="none"
+          keyboardType="email-address"
         />
-
         <TextInput
           style={globalStyles.input}
           placeholder="Contraseña"
           value={password}
           onChangeText={setPassword}
-          secureTextEntry // Ocultar texto
+          secureTextEntry
         />
-
-        {/* Opción para recordar sesión */}
         <View style={styles.recordarSesionContainer}>
           <Switch
             value={recordarSesion}
@@ -84,7 +70,6 @@ export default function LoginScreen() {
           />
           <Text style={styles.recordarSesionTexto}>Recordar sesión</Text>
         </View>
-
         <TouchableOpacity
           style={[
             globalStyles.button,
@@ -92,7 +77,7 @@ export default function LoginScreen() {
             styles.botonLogin,
           ]}
           onPress={handleLogin}
-          disabled={cargando} // Deshabilitar mientras carga
+          disabled={cargando}
         >
           {cargando ? (
             <ActivityIndicator color={colors.white} />
@@ -100,10 +85,14 @@ export default function LoginScreen() {
             <Text style={globalStyles.buttonText}>Iniciar Sesión</Text>
           )}
         </TouchableOpacity>
-
         <TouchableOpacity onPress={() => router.push("/auth/registro")}>
           <Text style={styles.linkRegistro}>
             ¿No tienes cuenta? Regístrate aquí
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => router.push("/auth/reestablecer")}>
+          <Text style={styles.linkRegistro}>
+            ¿Olvidaste tu contraseña?
           </Text>
         </TouchableOpacity>
       </View>
@@ -111,6 +100,7 @@ export default function LoginScreen() {
   );
 }
 
+// ... (mismos estilos que antes)
 const styles = StyleSheet.create({
   titulo: {
     fontSize: fontSize.xxxl,

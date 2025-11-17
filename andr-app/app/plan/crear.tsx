@@ -1,10 +1,9 @@
-// app/plan/crear.tsx (Solo para entrenadores)
+// app/plan/crear.tsx (Solo para asesores)
 import { useRouter } from "expo-router";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   ActivityIndicator,
   Alert,
-  FlatList,
   ScrollView,
   StyleSheet,
   Text,
@@ -14,7 +13,6 @@ import {
 } from "react-native";
 import { useAuth } from "../../src/presentation/hooks/useAuth";
 import { usePlanes } from "../../src/presentation/hooks/usePlanes";
-import { useRutinas } from "../../src/presentation/hooks/useRutinas";
 import { globalStyles } from "../../src/styles/globalStyles";
 import {
   colors,
@@ -23,32 +21,27 @@ import {
 } from "../../src/styles/theme";
 
 export default function CrearPlanScreen() {
-  const { usuario, esEntrenador: esEntrenador } = useAuth();
-  const { crear: crearPlan } = usePlanes();
-  const { rutinas: rutinasDisponibles, cargarRutinas } = useRutinas();
+  const { usuario, esAsesorComercial } = useAuth();
+  const { crear } = usePlanes();
   const router = useRouter();
+
   const [nombre, setNombre] = useState("");
-  const [descripcion, setDescripcion] = useState("");
-  const [rutinasSeleccionadas, setRutinasSeleccionadas] = useState<string[]>([]);
+  const [precio, setPrecio] = useState("");
+  const [segmento, setSegmento] = useState("");
+  const [publicoObjetivo, setPublicoObjetivo] = useState("");
+  const [datosMoviles, setDatosMoviles] = useState("");
+  const [minutosVoz, setMinutosVoz] = useState("");
+  const [sms, setSms] = useState("");
+  const [velocidad4g, setVelocidad4g] = useState("");
+  const [redesSociales, setRedesSociales] = useState("");
+  const [whatsapp, setWhatsapp] = useState("");
+  const [llamadasInternacionales, setLlamadasInternacionales] = useState("");
+  const [roaming, setRoaming] = useState("");
   const [cargando, setCargando] = useState(false);
 
-  useEffect(() => {
-    if (esEntrenador && usuario?.id) {
-      cargarRutinas(usuario.id);
-    }
-  }, [esEntrenador, usuario?.id]);
-
-  const toggleRutina = (id: string) => {
-    if (rutinasSeleccionadas.includes(id)) {
-      setRutinasSeleccionadas(rutinasSeleccionadas.filter(rId => rId !== id));
-    } else {
-      setRutinasSeleccionadas([...rutinasSeleccionadas, id]);
-    }
-  };
-
   const handleCrear = async () => {
-    if (!nombre || !descripcion || rutinasSeleccionadas.length === 0) {
-      Alert.alert("Error", "Completa todos los campos y selecciona al menos una rutina");
+    if (!nombre || !precio) {
+      Alert.alert("Error", "Completa los campos obligatorios (Nombre y Precio)");
       return;
     }
     if (!usuario) {
@@ -56,16 +49,29 @@ export default function CrearPlanScreen() {
         return;
     }
     setCargando(true);
-    const resultado = await crearPlan(nombre, descripcion, usuario.id, rutinasSeleccionadas);
+    const planData = {
+        nombre_comercial: nombre,
+        precio: parseFloat(precio),
+        segmento,
+        publico_objetivo: publicoObjetivo,
+        datos_móviles: datosMoviles,
+        minutos_voz: minutosVoz,
+        sms,
+        velocidad_4g: velocidad4g,
+        redes_sociales: redesSociales,
+        whatsapp,
+        llamadas_internacionales: llamadasInternacionales,
+        roaming,
+        asesor_id: usuario.id,
+        activo: true,
+    };
+    const resultado = await crear(planData);
     setCargando(false);
     if (resultado.success) {
       Alert.alert("Éxito", "Plan creado correctamente", [
         {
           text: "OK",
           onPress: () => {
-            setNombre("");
-            setDescripcion("");
-            setRutinasSeleccionadas([]);
             router.push("/(tabs)/misPlanes");
           },
         },
@@ -75,7 +81,7 @@ export default function CrearPlanScreen() {
     }
   };
 
-  if (!esEntrenador) {
+  if (!esAsesorComercial) {
     return (
       <View style={globalStyles.container}>
         <View style={styles.header}>
@@ -84,8 +90,8 @@ export default function CrearPlanScreen() {
           </TouchableOpacity>
         </View>
         <View style={globalStyles.containerCentered}>
-          <Text style={styles.textoNoEntrenador}>
-            Esta sección es solo para entrenadores 🏋️‍♂️
+          <Text style={styles.textoNoAsesor}>
+            Esta sección es solo para asesores comerciales 💼
           </Text>
         </View>
       </View>
@@ -93,7 +99,7 @@ export default function CrearPlanScreen() {
   }
 
   return (
-    <View style={[globalStyles.container, { paddingTop: spacing.md }]}>
+    <ScrollView style={globalStyles.container}>
       <View style={globalStyles.contentPadding}>
         <View style={styles.header}>
           <TouchableOpacity onPress={() => router.push("/(tabs)/misPlanes")}>
@@ -101,42 +107,19 @@ export default function CrearPlanScreen() {
           </TouchableOpacity>
           <Text style={globalStyles.title}>Nuevo Plan</Text>
         </View>
-        <TextInput
-          style={globalStyles.input}
-          placeholder="Nombre del plan"
-          value={nombre}
-          onChangeText={setNombre}
-        />
-        <TextInput
-          style={[globalStyles.input, globalStyles.inputMultiline]}
-          placeholder="Descripción"
-          value={descripcion}
-          onChangeText={setDescripcion}
-          multiline
-          numberOfLines={4}
-        />
-        <Text style={globalStyles.subtitle}>Selecciona Rutinas:</Text>
-        {rutinasDisponibles.length === 0 ? (
-          <Text style={globalStyles.emptyState}>No tienes rutinas para asignar</Text>
-        ) : (
-          <FlatList
-            data={rutinasDisponibles}
-            keyExtractor={(item) => item.id}
-            contentContainerStyle={{ gap: spacing.sm }}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                style={[
-                  globalStyles.card,
-                  rutinasSeleccionadas.includes(item.id) && styles.rutinaSeleccionada
-                ]}
-                onPress={() => toggleRutina(item.id)}
-              >
-                <Text style={styles.nombreRutina}>{item.titulo}</Text>
-                <Text style={globalStyles.textSecondary}>{item.descripcion}</Text>
-              </TouchableOpacity>
-            )}
-          />
-        )}
+        <TextInput style={globalStyles.input} placeholder="Nombre Comercial *" value={nombre} onChangeText={setNombre} />
+        <TextInput style={globalStyles.input} placeholder="Precio *" value={precio} onChangeText={setPrecio} keyboardType="numeric" />
+        <TextInput style={globalStyles.input} placeholder="Segmento" value={segmento} onChangeText={setSegmento} />
+        <TextInput style={globalStyles.input} placeholder="Público Objetivo" value={publicoObjetivo} onChangeText={setPublicoObjetivo} />
+        <TextInput style={globalStyles.input} placeholder="Datos Móviles" value={datosMoviles} onChangeText={setDatosMoviles} />
+        <TextInput style={globalStyles.input} placeholder="Minutos de Voz" value={minutosVoz} onChangeText={setMinutosVoz} />
+        <TextInput style={globalStyles.input} placeholder="SMS" value={sms} onChangeText={setSms} />
+        <TextInput style={globalStyles.input} placeholder="Velocidad 4G" value={velocidad4g} onChangeText={setVelocidad4g} />
+        <TextInput style={globalStyles.input} placeholder="Redes Sociales" value={redesSociales} onChangeText={setRedesSociales} />
+        <TextInput style={globalStyles.input} placeholder="WhatsApp" value={whatsapp} onChangeText={setWhatsapp} />
+        <TextInput style={globalStyles.input} placeholder="Llamadas Internacionales" value={llamadasInternacionales} onChangeText={setLlamadasInternacionales} />
+        <TextInput style={globalStyles.input} placeholder="Roaming" value={roaming} onChangeText={setRoaming} />
+
         <TouchableOpacity
           style={[
             globalStyles.button,
@@ -153,7 +136,7 @@ export default function CrearPlanScreen() {
           )}
         </TouchableOpacity>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
@@ -168,20 +151,12 @@ const styles = StyleSheet.create({
     color: colors.primary,
     marginBottom: spacing.sm,
   },
-  textoNoEntrenador: {
+  textoNoAsesor: {
     fontSize: fontSize.xl,
     fontWeight: "bold",
     textAlign: "center",
     color: colors.textPrimary,
     marginBottom: spacing.sm,
-  },
-  rutinaSeleccionada: {
-    backgroundColor: colors.primaryLight,
-  },
-  nombreRutina: {
-    fontSize: fontSize.md,
-    fontWeight: 'bold',
-    color: colors.textPrimary,
   },
   botonCrear: {
     marginTop: spacing.sm,

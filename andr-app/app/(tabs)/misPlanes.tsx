@@ -1,6 +1,6 @@
-// app/(tabs)/misPlanes.tsx (Solo para entrenadores)
+// app/(tabs)/misPlanes.tsx (Ahora Catálogo para Usuario, Mis Planes para Asesor)
 import { useRouter } from "expo-router";
-import React, { useEffect, useState } from "react"; // 
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -21,31 +21,28 @@ import {
 } from "../../src/styles/theme";
 
 export default function MisPlanesScreen() {
-  const { usuario, esEntrenador: esEntrenador } = useAuth(); // Renombrar para claridad
-  const { planes, cargando, cargarPlanes, eliminar } = usePlanes();
+  const { usuario, esUsuarioRegistrado, esAsesorComercial } = useAuth();
+  const { planes, cargando, cargarPlanesPublicos, cargarPlanesAsesor, eliminar } = usePlanes();
   const [refrescando, setRefrescando] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    if (esEntrenador && usuario?.id) {
-      cargarPlanes(usuario.id);
-    }
-  }, [esEntrenador, usuario?.id]);
-
-  if (!esEntrenador) {
-    return (
-      <View style={globalStyles.containerCentered}>
-        <Text style={styles.textoNoEntrenador}>
-          Esta sección es solo para entrenadores 🏋️‍♂️
-        </Text>
-      </View>
-    );
-  }
+    const cargar = async () => {
+      if (esAsesorComercial && usuario?.id) {
+        await cargarPlanesAsesor(usuario.id);
+      } else if (esUsuarioRegistrado) {
+        await cargarPlanesPublicos();
+      }
+    };
+    cargar();
+  }, [esAsesorComercial, esUsuarioRegistrado, usuario?.id]);
 
   const handleRefresh = async () => {
     setRefrescando(true);
-    if (usuario?.id) {
-      await cargarPlanes(usuario.id);
+    if (esAsesorComercial && usuario?.id) {
+      await cargarPlanesAsesor(usuario.id);
+    } else if (esUsuarioRegistrado) {
+      await cargarPlanesPublicos();
     }
     setRefrescando(false);
   };
@@ -53,12 +50,9 @@ export default function MisPlanesScreen() {
   const handleEliminar = (planId: string) => {
     Alert.alert(
       "Confirmar eliminación",
-      "¿Estás seguro de que quieres eliminar este plan? Esta acción no se puede deshacer.",
+      "¿Estás seguro de que quieres eliminar este plan?",
       [
-        {
-          text: "Cancelar",
-          style: "cancel",
-        },
+        { text: "Cancelar", style: "cancel" },
         {
           text: "Eliminar",
           style: "destructive",
@@ -66,7 +60,7 @@ export default function MisPlanesScreen() {
             const resultado = await eliminar(planId);
             if (resultado.success) {
               Alert.alert("Éxito", "Plan eliminado correctamente");
-              // Recargar no es necesario si el hook lo hace internamente
+              // La lista se recargará automáticamente al refrescar o al volver a la pantalla
             } else {
               Alert.alert("Error", resultado.error || "No se pudo eliminar");
             }
@@ -75,6 +69,48 @@ export default function MisPlanesScreen() {
       ]
     );
   };
+
+  const renderItem = ({ item }: { item: any }) => (
+    <View style={globalStyles.card}>
+      <Text style={styles.tituloPlan}>{item.nombre_comercial}</Text>
+      <Text style={globalStyles.textSecondary}>${item.precio}/mes</Text>
+      <Text style={globalStyles.textSecondary} numberOfLines={2}>
+        {item.publico_objetivo}
+      </Text>
+      {esAsesorComercial && (
+        <View style={styles.botonesAccion}>
+          <TouchableOpacity
+            style={[
+              globalStyles.button,
+              globalStyles.buttonSecondary,
+              styles.botonAccion,
+            ]}
+            onPress={() => router.push(`/plan/editar?id=${item.id}`)}
+          >
+            <Text style={globalStyles.buttonText}>✏️ Editar</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              globalStyles.button,
+              globalStyles.buttonDanger,
+              styles.botonAccion,
+            ]}
+            onPress={() => handleEliminar(item.id)}
+          >
+            <Text style={globalStyles.buttonText}>🗑️ Eliminar</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+      {esUsuarioRegistrado && (
+        <TouchableOpacity
+          style={[globalStyles.button, globalStyles.buttonPrimary, styles.botonContratar]}
+          onPress={() => router.push(`/detallePlan?id=${item.id}`)} // Navegar a detalle para contratar
+        >
+          <Text style={globalStyles.buttonText}>Contratar</Text>
+        </TouchableOpacity>
+      )}
+    </View>
+  );
 
   if (cargando) {
     return (
@@ -87,13 +123,15 @@ export default function MisPlanesScreen() {
   return (
     <View style={globalStyles.container}>
       <View style={styles.header}>
-        <Text style={globalStyles.title}>Mis Planes</Text>
-        <TouchableOpacity
-          style={[globalStyles.button, globalStyles.buttonPrimary]}
-          onPress={() => router.push("/plan/crear")}
-        >
-          <Text style={globalStyles.buttonText}>+ Nuevo</Text>
-        </TouchableOpacity>
+        <Text style={globalStyles.title}>{esAsesorComercial ? "Mis Planes" : "Catálogo de Planes"}</Text>
+        {esAsesorComercial && (
+          <TouchableOpacity
+            style={[globalStyles.button, globalStyles.buttonPrimary]}
+            onPress={() => router.push("/plan/crear")}
+          >
+            <Text style={globalStyles.buttonText}>+ Nuevo</Text>
+          </TouchableOpacity>
+        )}
       </View>
       <FlatList
         data={planes}
@@ -107,39 +145,10 @@ export default function MisPlanesScreen() {
         }
         ListEmptyComponent={
           <Text style={globalStyles.emptyState}>
-            No tienes planes creados
+            {esAsesorComercial ? "No tienes planes creados" : "No hay planes disponibles"}
           </Text>
         }
-        renderItem={({ item }) => (
-          <View style={globalStyles.card}>
-            <Text style={styles.tituloPlan}>{item.nombre}</Text>
-            <Text style={globalStyles.textSecondary} numberOfLines={2}>
-              {item.descripcion}
-            </Text>
-            <View style={styles.botonesAccion}>
-              <TouchableOpacity
-                style={[
-                  globalStyles.button,
-                  globalStyles.buttonSecondary,
-                  styles.botonAccion,
-                ]}
-                onPress={() => router.push(`/plan/editar?id=${item.id}`)}
-              >
-                <Text style={globalStyles.buttonText}>✏️ Editar</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  globalStyles.button,
-                  globalStyles.buttonDanger,
-                  styles.botonAccion,
-                ]}
-                onPress={() => handleEliminar(item.id)}
-              >
-                <Text style={globalStyles.buttonText}>🗑️ Eliminar</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        )}
+        renderItem={renderItem}
       />
     </View>
   );
@@ -152,13 +161,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: spacing.md,
     paddingTop: spacing.md,
-  },
-  textoNoEntrenador: {
-    fontSize: fontSize.xl,
-    fontWeight: "bold",
-    textAlign: "center",
-    color: colors.textPrimary,
-    marginBottom: spacing.sm,
   },
   tituloPlan: {
     fontSize: fontSize.lg,
@@ -173,6 +175,10 @@ const styles = StyleSheet.create({
   },
   botonAccion: {
     flex: 1,
+    paddingVertical: spacing.sm,
+  },
+  botonContratar: {
+    marginTop: spacing.md,
     paddingVertical: spacing.sm,
   },
 });

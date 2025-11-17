@@ -1,5 +1,6 @@
 // app/plan/_layout.tsx (Layout para rutas de plan)
 import { Stack } from "expo-router";
+
 export default function PlanLayout() {
   return (
     <Stack
@@ -18,7 +19,7 @@ export default function PlanLayout() {
         name="editar"
         options={{
           headerShown: false,
-          presentation: "modal",
+          presentation: "modal", // O "card" si se prefiere
         }}
       />
     </Stack>

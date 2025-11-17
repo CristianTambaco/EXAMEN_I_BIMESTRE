@@ -1,40 +1,41 @@
 // src/presentation/hooks/usePlanes.ts
 import { useState } from "react";
-import { PlanEntrenamiento } from "../../domain/models/PlanEntrenamiento";
+import { Plan } from "../../domain/models/Plan";
 import { PlanesUseCase } from "../../domain/useCases/planes/PlanesUseCase";
 
 const planesUseCase = new PlanesUseCase();
 
 export function usePlanes() {
-  const [planes, setPlanes] = useState<PlanEntrenamiento[]>([]);
+  const [planes, setPlanes] = useState<Plan[]>([]);
   const [cargando, setCargando] = useState(true);
 
-  const cargarPlanes = async (entrenadorId: string) => {
+  const cargarPlanesPublicos = async () => {
     setCargando(true);
-    const data = await planesUseCase.obtenerPlanesPorEntrenador(entrenadorId);
+    const data = await planesUseCase.obtenerPlanesActivos();
     setPlanes(data);
     setCargando(false);
   };
 
-  const cargarPlanesAsignados = async (usuarioId: string) => {
-      setCargando(true);
-      const data = await planesUseCase.obtenerPlanesAsignadosAUsuario(usuarioId);
-      setPlanes(data);
-      setCargando(false);
+  const cargarPlanesAsesor = async (asesorId: string) => {
+    setCargando(true);
+    const data = await planesUseCase.obtenerPlanesPorAsesor(asesorId);
+    setPlanes(data);
+    setCargando(false);
   };
 
-  const crear = async (nombre: string, descripcion: string, entrenadorId: string, rutinasIds: string[]) => {
-    const resultado = await planesUseCase.crearPlan(nombre, descripcion, entrenadorId, rutinasIds);
+  const crear = async (planData: Omit<Plan, 'id' | 'created_at' | 'updated_at' | 'activo'>) => {
+    const resultado = await planesUseCase.crearPlan(planData);
     if (resultado.success) {
-      // await cargarPlanes(entrenadorId); // Recargar para entrenador
+      // Opcional: Recargar lista de asesor
+      // await cargarPlanesAsesor(asesorId);
     }
     return resultado;
   };
 
-  const actualizar = async (id: string, nombre: string, descripcion: string, rutinasIds: string[]) => {
-    const resultado = await planesUseCase.actualizarPlan(id, nombre, descripcion, rutinasIds);
+  const actualizar = async (id: string, planData: Partial<Omit<Plan, 'id' | 'created_at' | 'updated_at'>>) => {
+    const resultado = await planesUseCase.actualizarPlan(id, planData);
     if (resultado.success) {
-      // await cargarPlanes(entrenadorId);
+      // Actualizar estado local si es necesario
     }
     return resultado;
   };
@@ -42,28 +43,18 @@ export function usePlanes() {
   const eliminar = async (id: string) => {
     const resultado = await planesUseCase.eliminarPlan(id);
     if (resultado.success) {
-      // await cargarPlanes(entrenadorId);
+      // Actualizar estado local si es necesario
     }
     return resultado;
-  };
-
-  const asignarPlan = async (planId: string, usuarioId: string) => {
-    return await planesUseCase.asignarPlanAUsuario(planId, usuarioId);
-  };
-
-  const desasignarPlan = async (planId: string, usuarioId: string) => {
-    return await planesUseCase.desasignarPlanAUsuario(planId, usuarioId);
   };
 
   return {
     planes,
     cargando,
-    cargarPlanes,
-    cargarPlanesAsignados,
+    cargarPlanesPublicos,
+    cargarPlanesAsesor,
     crear,
     actualizar,
     eliminar,
-    asignarPlan,
-    desasignarPlan,
   };
 }
