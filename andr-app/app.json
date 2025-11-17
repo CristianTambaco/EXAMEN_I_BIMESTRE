@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "andr-app",
-    "slug": "andr-app",
+    "name": "Tigo Conecta",
+    "slug": "tigo-conecta",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "andrapp",
+    "scheme": "tigoconecta",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
