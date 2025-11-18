@@ -149,44 +149,82 @@ export default function EditarPlanScreen() {
   }
 
   return (
-    <ScrollView style={globalStyles.container}>
-      <View style={globalStyles.contentPadding}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.push("/(tabs)/misPlanes")}>
-            <Text style={styles.botonVolver}>← Volver</Text>
-          </TouchableOpacity>
-          <Text style={globalStyles.title}>Editar Plan</Text>
-        </View>
-        <TextInput style={globalStyles.input} placeholder="Nombre Comercial *" value={nombre} onChangeText={setNombre} />
-        <TextInput style={globalStyles.input} placeholder="Precio *" value={precio} onChangeText={setPrecio} keyboardType="numeric" />
-        <TextInput style={globalStyles.input} placeholder="Segmento" value={segmento} onChangeText={setSegmento} />
-        <TextInput style={globalStyles.input} placeholder="Público Objetivo" value={publicoObjetivo} onChangeText={setPublicoObjetivo} />
-        <TextInput style={globalStyles.input} placeholder="Datos Móviles" value={datosMoviles} onChangeText={setDatosMoviles} />
-        <TextInput style={globalStyles.input} placeholder="Minutos de Voz" value={minutosVoz} onChangeText={setMinutosVoz} />
-        <TextInput style={globalStyles.input} placeholder="SMS" value={sms} onChangeText={setSms} />
-        <TextInput style={globalStyles.input} placeholder="Velocidad 4G" value={velocidad4g} onChangeText={setVelocidad4g} />
-        <TextInput style={globalStyles.input} placeholder="Redes Sociales" value={redesSociales} onChangeText={setRedesSociales} />
-        <TextInput style={globalStyles.input} placeholder="WhatsApp" value={whatsapp} onChangeText={setWhatsapp} />
-        <TextInput style={globalStyles.input} placeholder="Llamadas Internacionales" value={llamadasInternacionales} onChangeText={setLlamadasInternacionales} />
-        <TextInput style={globalStyles.input} placeholder="Roaming" value={roaming} onChangeText={setRoaming} />
-        <TouchableOpacity
-          style={[
-            globalStyles.button,
-            globalStyles.buttonPrimary,
-            styles.botonGuardar,
-          ]}
-          onPress={handleGuardar}
-          disabled={cargandoGuardado}
-        >
-          {cargandoGuardado ? (
-            <ActivityIndicator color={colors.white} />
-          ) : (
-            <Text style={globalStyles.buttonText}>Guardar Cambios</Text>
-          )}
+  <ScrollView style={globalStyles.container}>
+    <View style={globalStyles.contentPadding}>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.push("/(tabs)/misPlanes")}>
+          <Text style={styles.botonVolver}>← Volver</Text>
         </TouchableOpacity>
+        <Text style={globalStyles.title}>Editar Plan</Text>
       </View>
-    </ScrollView>
-  );
+
+      {/* Campo: Nombre Comercial */}
+      <Text style={globalStyles.subtitle}>Nombre Comercial *</Text>
+      <TextInput style={globalStyles.input} placeholder="Nombre Comercial *" value={nombre} onChangeText={setNombre} />
+
+      {/* Campo: Precio */}
+      <Text style={globalStyles.subtitle}>Precio *</Text>
+      <TextInput style={globalStyles.input} placeholder="Precio *" value={precio} onChangeText={setPrecio} keyboardType="numeric" />
+
+      {/* Campo: Segmento */}
+      <Text style={globalStyles.subtitle}>Segmento</Text>
+      <TextInput style={globalStyles.input} placeholder="Segmento" value={segmento} onChangeText={setSegmento} />
+
+      {/* Campo: Público Objetivo */}
+      <Text style={globalStyles.subtitle}>Público Objetivo</Text>
+      <TextInput style={globalStyles.input} placeholder="Público Objetivo" value={publicoObjetivo} onChangeText={setPublicoObjetivo} />
+
+      {/* Campo: Datos Móviles */}
+      <Text style={globalStyles.subtitle}>Datos Móviles</Text>
+      <TextInput style={globalStyles.input} placeholder="Datos Móviles" value={datosMoviles} onChangeText={setDatosMoviles} />
+
+      {/* Campo: Minutos de Voz */}
+      <Text style={globalStyles.subtitle}>Minutos de Voz</Text>
+      <TextInput style={globalStyles.input} placeholder="Minutos de Voz" value={minutosVoz} onChangeText={setMinutosVoz} />
+
+      {/* Campo: SMS */}
+      <Text style={globalStyles.subtitle}>SMS</Text>
+      <TextInput style={globalStyles.input} placeholder="SMS" value={sms} onChangeText={setSms} />
+
+      {/* Campo: Velocidad 4G */}
+      <Text style={globalStyles.subtitle}>Velocidad 4G</Text>
+      <TextInput style={globalStyles.input} placeholder="Velocidad 4G" value={velocidad4g} onChangeText={setVelocidad4g} />
+
+      {/* Campo: Redes Sociales */}
+      <Text style={globalStyles.subtitle}>Redes Sociales</Text>
+      <TextInput style={globalStyles.input} placeholder="Redes Sociales" value={redesSociales} onChangeText={setRedesSociales} />
+
+      {/* Campo: WhatsApp */}
+      <Text style={globalStyles.subtitle}>WhatsApp</Text>
+      <TextInput style={globalStyles.input} placeholder="WhatsApp" value={whatsapp} onChangeText={setWhatsapp} />
+
+      {/* Campo: Llamadas Internacionales */}
+      <Text style={globalStyles.subtitle}>Llamadas Internacionales</Text>
+      <TextInput style={globalStyles.input} placeholder="Llamadas Internacionales" value={llamadasInternacionales} onChangeText={setLlamadasInternacionales} />
+
+      {/* Campo: Roaming */}
+      <Text style={globalStyles.subtitle}>Roaming</Text>
+      <TextInput style={globalStyles.input} placeholder="Roaming" value={roaming} onChangeText={setRoaming} />
+
+      {/* Botón Guardar */}
+      <TouchableOpacity
+        style={[
+          globalStyles.button,
+          globalStyles.buttonPrimary,
+          styles.botonGuardar,
+        ]}
+        onPress={handleGuardar}
+        disabled={cargandoGuardado}
+      >
+        {cargandoGuardado ? (
+          <ActivityIndicator color={colors.white} />
+        ) : (
+          <Text style={globalStyles.buttonText}>Guardar Cambios</Text>
+        )}
+      </TouchableOpacity>
+    </View>
+  </ScrollView>
+);
 }
 
 const styles = StyleSheet.create({
