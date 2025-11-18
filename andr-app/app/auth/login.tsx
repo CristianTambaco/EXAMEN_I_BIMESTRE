@@ -76,7 +76,7 @@ export default function LoginScreen() {
         />
 
         {/* Botones de inicio de sesión */}
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={[styles.button, styles.buttonPrimary]}
           onPress={handleLogin}
           disabled={cargando}
@@ -86,7 +86,7 @@ export default function LoginScreen() {
           ) : (
             <Text style={styles.buttonText}>Ingresar como Usuario</Text>
           )}
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         <TouchableOpacity
           style={[styles.button, styles.buttonSecondary]}
@@ -96,7 +96,7 @@ export default function LoginScreen() {
           {cargando ? (
             <ActivityIndicator color={colors.white} />
           ) : (
-            <Text style={styles.buttonText}>Ingresar como Asesor</Text>
+            <Text style={styles.buttonText}>Ingresar </Text>
           )}
         </TouchableOpacity>
 
