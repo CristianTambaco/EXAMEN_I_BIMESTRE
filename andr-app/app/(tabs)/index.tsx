@@ -125,7 +125,7 @@ export default function HomeScreen() {
               style={[globalStyles.button, globalStyles.buttonSecondary, styles.verMasButton]}
               onPress={() => router.push("/(tabs)/misPlanes")}
             >
-              <Text style={globalStyles.buttonText}>Ver todos los planes</Text>
+              <Text style={globalStyles.buttonText}>Ver planes.</Text>
             </TouchableOpacity>
           </>
         }

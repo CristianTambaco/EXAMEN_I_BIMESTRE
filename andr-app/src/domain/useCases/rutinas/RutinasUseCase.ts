@@ -242,4 +242,14 @@ export class RutinasUseCase {
       return null;
     }
   }
+
+
+  // 
+  async subirImagenPlan(uri: string): Promise<string> {
+    return this.subirImagen(uri, "planes-fotos"); // bucket 'planes-fotos' 
+  }
+
+
+
+
 }

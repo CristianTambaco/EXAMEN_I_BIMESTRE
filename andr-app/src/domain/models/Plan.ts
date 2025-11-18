@@ -13,7 +13,8 @@ export interface Plan {
   whatsapp: string;
   llamadas_internacionales: string;
   roaming: string;
-  imagen_url?: string;
+
+  imagen_url?: string; // URL opcional 
   activo: boolean;
   asesor_id: string;
   created_at: string;

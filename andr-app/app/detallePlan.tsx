@@ -120,7 +120,7 @@ export default function DetallePlanScreen() {
             style={[styles.button, styles.buttonPrimary]}
             onPress={handleContratar}
           >
-            <Text style={styles.buttonText}>Ver Detalles</Text>
+            <Text style={styles.buttonText}>Ver Detalles.</Text>
           </TouchableOpacity>
         </View>
       </View>

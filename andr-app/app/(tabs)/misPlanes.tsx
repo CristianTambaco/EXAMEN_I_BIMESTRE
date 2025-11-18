@@ -1,4 +1,4 @@
-// app/(tabs)/misPlanes.tsx
+// app/(tabs)/misPlanes.tsx (Versión actualizada)
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
@@ -126,22 +126,33 @@ export default function MisPlanesScreen() {
 
   return (
     <View style={globalStyles.container}>
-      {/* Barra superior */}
-      <View style={styles.header}>
-        <Text style={globalStyles.title}>
-          {esAsesorComercial ? "Gestión de Planes" : "Catálogo de Planes"}
-        </Text>
-        {esAsesorComercial && (
-          <TouchableOpacity
-            style={[globalStyles.button, globalStyles.buttonPrimary]}
-            onPress={() => router.push("/plan/crear")}
-          >
-            <Text style={globalStyles.buttonText}>+ Crear Nuevo Plan</Text>
-          </TouchableOpacity>
-        )}
+      {/* Barra superior verde */}
+      <View style={styles.headerBar}>
+        <View style={styles.rolLabelContainer}>
+          <Text style={styles.rolLabel}>{esAsesorComercial ? "💼 Asesor Comercial" : "👤 Usuario Registrado"}</Text>
+        </View>
+        <Text style={styles.headerTitle}>Panel</Text>
+        <TouchableOpacity style={styles.menuButton}>
+
+          {/* <Text style={styles.menuIcon}>☰</Text> */}
+          
+        </TouchableOpacity>
       </View>
 
-      {/* Lista de Planes */}
+      {/* Sección azul de Gestión de Planes */}
+      <View style={styles.gestionSection}>
+        <Text style={styles.gestionTitle}>Gestión de Planes</Text>
+        <Text style={styles.gestionSubtitle}>Administra el catálogo de planes móviles</Text>
+        <TouchableOpacity
+          style={[styles.createButton, styles.createButtonPrimary]}
+          onPress={() => router.push("/plan/crear")}
+        >
+          <Text style={styles.createButtonText}>+ Crear Nuevo Plan</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Sección de Planes Activos */}
+      <Text style={styles.sectionTitle}>Planes Activos</Text>
       <FlatList
         data={planes}
         keyExtractor={(item) => item.id}
@@ -152,24 +163,91 @@ export default function MisPlanesScreen() {
             onRefresh={handleRefresh}
           />
         }
-        ListEmptyComponent={
-          <Text style={globalStyles.emptyState}>
-            {esAsesorComercial ? "No tienes planes creados" : "No hay planes disponibles"}
-          </Text>
-        }
         renderItem={renderItem}
+        ListEmptyComponent={<Text style={globalStyles.emptyState}>No tienes planes creados</Text>}
       />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  header: {
+  headerBar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    backgroundColor: colors.primary, // Verde
     paddingHorizontal: spacing.md,
-    paddingTop: spacing.md,
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.sm,
+  },
+  rolLabelContainer: {
+    backgroundColor: '#00C853', // Verde brillante
+    paddingHorizontal: spacing.xs,
+    paddingVertical: spacing.xs,
+    borderRadius: borderRadius.round,
+  },
+  rolLabel: {
+    fontSize: fontSize.xs,
+    fontWeight: 'bold',
+    color: colors.white,
+  },
+  headerTitle: {
+    fontSize: fontSize.xl,
+    fontWeight: 'bold',
+    color: colors.white,
+    textAlign: 'center',
+    flex: 1,
+    marginLeft: spacing.sm,
+  },
+  menuButton: {
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  menuIcon: {
+    fontSize: fontSize.lg,
+    color: colors.white,
+  },
+  gestionSection: {
+    backgroundColor: colors.secondary, // Azul claro
+    marginHorizontal: spacing.md,
+    marginTop: spacing.md,
+    marginBottom: spacing.lg,
+    padding: spacing.lg,
+    borderRadius: borderRadius.lg,
+  },
+  gestionTitle: {
+    fontSize: fontSize.xxxl,
+    fontWeight: 'bold',
+    color: colors.white,
+    marginBottom: spacing.sm,
+  },
+  gestionSubtitle: {
+    fontSize: fontSize.md,
+    color: colors.white,
+    marginBottom: spacing.lg,
+  },
+  createButton: {
+    borderRadius: borderRadius.lg,
+    paddingVertical: spacing.lg,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  createButtonPrimary: {
+    backgroundColor: colors.primary, // Azul oscuro
+  },
+  createButtonText: {
+    color: colors.white,
+    fontSize: fontSize.md,
+    fontWeight: '600',
+  },
+  sectionTitle: {
+    fontSize: fontSize.lg,
+    fontWeight: '600',
+    color: colors.textPrimary,
+    marginHorizontal: spacing.md,
+    marginBottom: spacing.sm,
   },
   tituloPlan: {
     fontSize: fontSize.lg,
