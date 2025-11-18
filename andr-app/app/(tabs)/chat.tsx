@@ -103,7 +103,7 @@ export default function ChatScreen() {
       {/* Barra superior */}
       <View style={styles.headerBar}>
         <View style={styles.rolLabelContainer}>
-          <Text style={styles.rolLabel}>Asesor Comercial</Text>
+          {/* <Text style={styles.rolLabel}>Asesor Comercial</Text> */}
         </View>
         <Text style={styles.headerTitle}>Conversaciones</Text>
         <TouchableOpacity style={styles.menuButton}>
