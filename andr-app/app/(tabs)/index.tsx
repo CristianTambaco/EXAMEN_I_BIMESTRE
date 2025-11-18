@@ -65,7 +65,7 @@ export default function HomeScreen() {
     setRefrescando(false);
   };
 
-  // Función para renderizar un plan en formato de tarjeta (como en la segunda imagen)
+  // Función para renderizar un plan en formato de tarjeta 
   const renderItem = ({ item }: { item: any }) => (
     <View style={styles.planCard}>
       {/* Encabezado con gradiente  */}

@@ -1,4 +1,4 @@
-// app/detallePlan.tsx (Modificado)
+// app/detallePlan.tsx (Modificado para cargar el plan específico)
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
@@ -26,7 +26,7 @@ import { Plan } from "../src/domain/models/Plan";
 export default function DetallePlanScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { usuario } = useAuth();
-  const { crear } = usePlanes();
+  const { crear } = usePlanes(); // 
   const router = useRouter();
   const [plan, setPlan] = useState<Plan | null>(null);
   const [cargando, setCargando] = useState(true);
@@ -44,7 +44,9 @@ export default function DetallePlanScreen() {
         .eq("id", planId)
         .eq("activo", true)
         .single();
+
       if (error) throw error;
+
       setPlan(data as Plan);
     } catch (error) {
       console.error("Error al cargar el plan:", error);
@@ -64,7 +66,8 @@ export default function DetallePlanScreen() {
       Alert.alert("Error", "Plan no disponible.");
       return;
     }
-    
+
+
     router.push("/(tabs)/misPlanes"); 
   };
 
@@ -98,30 +101,31 @@ export default function DetallePlanScreen() {
         <View style={styles.headerGradient}>
           {/* Aquí podrías usar una imagen o un gradiente real si es necesario */}
         </View>
-
         <View style={styles.planContent}>
           <Text style={styles.planTitle}>{plan.nombre_comercial}</Text>
           <Text style={styles.planPrice}>${plan.precio}/mes</Text>
-
           {/* Características del plan */}
           <View style={styles.featuresContainer}>
-            <View style={styles.featureBadge}>
-              <Text style={styles.featureBadgeText}>Redes sociales gratis</Text>
-            </View>
-            <Text style={styles.featureDescription}>Sin límites para tu conexión</Text>
+            {plan.redes_sociales && (
+              <View style={styles.featureBadge}>
+                <Text style={styles.featureBadgeText}>{plan.redes_sociales}</Text>
+              </View>
+            )}
+            <Text style={styles.featureDescription}>{plan.publico_objetivo}</Text>
             <View style={styles.featureIcons}>
-              <Text style={styles.featureIcon}>📱 Ilimitado</Text>
-              <Text style={styles.featureIcon}>📞 Ilimitado</Text>
+              <Text style={styles.featureIcon}>📱 {plan.datos_móviles}</Text>
+              <Text style={styles.featureIcon}>📞 {plan.minutos_voz}</Text>
             </View>
           </View>
-
           {/* Botón "Ver Detalles" */}
+
           <TouchableOpacity
             style={[styles.button, styles.buttonPrimary]}
             onPress={handleContratar}
           >
             <Text style={styles.buttonText}>Ver Detalles.</Text>
           </TouchableOpacity>
+
         </View>
       </View>
     </ScrollView>
