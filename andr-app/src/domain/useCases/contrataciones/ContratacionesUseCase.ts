@@ -38,7 +38,7 @@ export class ContratacionesUseCase {
     }
   }
 
-  async obtenerContratacionesPendientes(): Promise<Contratacion[]> {
+    async obtenerContratacionesPendientes(): Promise<Contratacion[]> {
     try {
       const { data, error } = await supabase
         .from("contrataciones")
@@ -82,4 +82,8 @@ export class ContratacionesUseCase {
       return { success: false, error: error.message };
     }
   }
+
+  
+
+
 }

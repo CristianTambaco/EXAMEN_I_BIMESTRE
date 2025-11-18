@@ -1,6 +1,6 @@
-// app/(tabs)/misPlanes.tsx
+// app/(tabs)/misPlanes.tsx (Versión corregida)
 import { useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react"; // 👈 Añade 'useCallback'
 import {
   ActivityIndicator,
   Alert,
@@ -26,19 +26,8 @@ export default function MisPlanesScreen() {
   const [refrescando, setRefrescando] = useState(false);
   const router = useRouter();
 
-  useEffect(() => {
-    const cargar = async () => {
-      if (esAsesorComercial && usuario?.id) {
-        await cargarPlanesAsesor(usuario.id);
-      } else if (esUsuarioRegistrado) {
-        await cargarPlanesPublicos();
-      }
-    };
-    cargar();
-  }, [esAsesorComercial, esUsuarioRegistrado, usuario?.id]);
-
-  // 👇 Define la función handleEliminar aquí
-  const handleEliminar = async (planId: string) => {
+  // 👇 Usa useCallback para definir handleEliminar
+  const handleEliminar = useCallback(async (planId: string) => {
     Alert.alert(
       "Confirmar eliminación",
       "¿Estás seguro de que quieres eliminar este plan?",
@@ -48,7 +37,7 @@ export default function MisPlanesScreen() {
           text: "Eliminar",
           style: "destructive",
           onPress: async () => {
-            const resultado = await eliminar(planId); // 👈 Llama a la función del hook
+            const resultado = await eliminar(planId);
             if (resultado.success) {
               Alert.alert("Éxito", "Plan eliminado correctamente");
               // Opcional: Recargar lista si es necesario
@@ -60,7 +49,18 @@ export default function MisPlanesScreen() {
         },
       ]
     );
-  };
+  }, [eliminar, usuario]); // 👈 Dependencias: eliminar y usuario
+
+  useEffect(() => {
+    const cargar = async () => {
+      if (esAsesorComercial && usuario?.id) {
+        await cargarPlanesAsesor(usuario.id);
+      } else if (esUsuarioRegistrado) {
+        await cargarPlanesPublicos();
+      }
+    };
+    cargar();
+  }, [esAsesorComercial, esUsuarioRegistrado, usuario?.id]);
 
   const handleRefresh = async () => {
     setRefrescando(true);
@@ -97,7 +97,7 @@ export default function MisPlanesScreen() {
               globalStyles.buttonDanger,
               styles.botonAccion,
             ]}
-            onPress={() => handleEliminar(item.id)} // 👈 Ahora sí existe
+            onPress={() => handleEliminar(item.id)} // 👈 Ahora sí existe y es segura
           >
             <Text style={globalStyles.buttonText}>🗑️ Eliminar</Text>
           </TouchableOpacity>
