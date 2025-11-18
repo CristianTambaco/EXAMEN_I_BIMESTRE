@@ -12,6 +12,18 @@ export function useAuth() {
 
   const [cargandoActualizar, setCargandoActualizar] = useState(false); // Nuevo estado
 
+
+  const enviarEnlaceReestablecimiento = async (email: string) => {
+    return await authUseCase.enviarEnlaceReestablecimiento(email);
+  };
+
+  // Opcional: Función para cambiar la contraseña nueva
+  const cambiarContrasenaNueva = async (nuevaContrasena: string) => {
+    return await authUseCase.cambiarContrasenaNueva(nuevaContrasena);
+  };
+
+
+
   useEffect(() => {
     verificarSesionInicial();
     const { data: subscription } = authUseCase.onAuthStateChange(
@@ -126,6 +138,10 @@ export function useAuth() {
     iniciarSesion,
     cerrarSesion,
     crearPerfilConRol,
+
+    enviarEnlaceReestablecimiento, // 
+    cambiarContrasenaNueva, // 
+
     esAsesorComercial: usuario?.rol === "asesor_comercial",
     esUsuarioRegistrado: usuario?.rol === "usuario_registrado",
   };

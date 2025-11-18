@@ -3,6 +3,8 @@ import { supabase } from "@/src/data/services/supabaseClient";
 import { StorageService } from "../../../data/services/storageService";
 import { Usuario } from "../../models/Usuario";
 
+
+
 export class AuthUseCase {
   async registrar(email: string, password: string, rol: "asesor_comercial" | "usuario_registrado") {
     try {
@@ -160,6 +162,40 @@ export class AuthUseCase {
       return { success: false, error: error.message };
     }
   }
+
+
+   async enviarEnlaceReestablecimiento(email: string) {
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        // Opcional: puedes redirigir al usuario a una URL específica del frontend
+        // redirectTo: 'https://tudominio.com/cambiar-contrasena',
+      });
+      if (error) throw error;
+      return { success: true };
+    } catch (error: any) {
+      console.error("Error en AuthUseCase.enviarEnlaceReestablecimiento:", error);
+      return { success: false, error: error.message };
+    }
+  }
+
+
+  async cambiarContrasenaNueva(nuevaContrasena: string) {
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password: nuevaContrasena,
+      });
+      if (error) throw error;
+
+      // Opcional: Obtener el usuario actualizado
+      const usuarioActualizado = await this.obtenerUsuarioActual();
+      return { success: true, usuario: usuarioActualizado };
+    } catch (error: any) {
+      console.error("Error en AuthUseCase.cambiarContrasenaNueva:", error);
+      return { success: false, error: error.message };
+    }
+  }
+
+
 
   
 
