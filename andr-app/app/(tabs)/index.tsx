@@ -1,4 +1,4 @@
-// app/(tabs)/index.tsx (Modificado para coincidir con el diseño de la segunda imagen)
+// app/(tabs)/index.tsx (Modificado para mostrar solo imagen, nombre y precio)
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -65,44 +65,6 @@ export default function HomeScreen() {
     setRefrescando(false);
   };
 
-  // Función para renderizar un plan en formato de tarjeta 
-  const renderItem = ({ item }: { item: any }) => (
-    <View style={styles.planCard}>
-      {/* Encabezado con gradiente  */}
-      <View style={styles.headerGradient} />
-      <View style={styles.planContent}>
-        <Text style={styles.planTitle}>{item.nombre_comercial}</Text>
-        <Text style={styles.planPrice}>${item.precio}/mes</Text>
-        {/* Características del plan */}
-        <View style={styles.featuresContainer}>
-
-          {item.redes_sociales && (
-            <View style={styles.featureBadge}>
-              <Text style={styles.featureBadgeText}>{item.redes_sociales}</Text>
-            </View>
-          )}
-
-          <Text style={styles.featureDescription}>{item.publico_objetivo}</Text>
-          <View style={styles.featureIcons}>
-            <Text style={styles.featureIcon}>📱 {item.datos_móviles}</Text>
-            <Text style={styles.featureIcon}>📞 {item.minutos_voz}</Text>
-          </View>
-        </View>
-        {/* Botón "Ver Detalles" */}
-
-        
-        {/* <TouchableOpacity
-          style={[styles.button, styles.buttonPrimary]}
-          onPress={() => router.push(`/detallePlan?id=${item.id}`)}
-        >
-          <Text style={styles.buttonText}>Ver Detalles</Text>
-        </TouchableOpacity> */}
-
-
-      </View>
-    </View>
-  );
-
   if (cargando) {
     return (
       <View style={globalStyles.loadingContainer}>
@@ -110,6 +72,28 @@ export default function HomeScreen() {
       </View>
     );
   }
+
+  // Función para renderizar un plan en formato de tarjeta simple (solo imagen, nombre y precio)
+  const renderItem = ({ item }: { item: any }) => (
+    <TouchableOpacity
+      style={[globalStyles.card, styles.planCard]}
+      onPress={() => router.push(`/detallePlan?id=${item.id}`)}
+    >
+      {/* Imagen del plan */}
+      {item.imagen_url ? (
+        <Image
+          source={{ uri: item.imagen_url }}
+          style={styles.planImage}
+        />
+      ) : (
+        <View style={styles.planImagePlaceholder}>
+          <Text style={globalStyles.textTertiary}>Sin imagen</Text>
+        </View>
+      )}
+      <Text style={styles.planTitle}>{item.nombre_comercial}</Text>
+      <Text style={styles.planPrice}>${item.precio}/mes</Text>
+    </TouchableOpacity>
+  );
 
   return (
     <View style={globalStyles.container}>
@@ -148,9 +132,20 @@ export default function HomeScreen() {
           />
         }
       />
+
+      {/* <TouchableOpacity
+        style={[globalStyles.button, globalStyles.buttonSecondary, styles.verMasButton]}
+        onPress={() => router.push("/(tabs)/misPlanes")}
+      >
+        <Text style={globalStyles.buttonText}>Ver planes.</Text>
+      </TouchableOpacity> */}
+
     </View>
   );
 }
+
+// Importación adicional necesaria
+import { Image } from 'react-native';
 
 const styles = StyleSheet.create({
   saludo: {
@@ -183,12 +178,21 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     ...shadows.medium,
   },
-  headerGradient: {
+  planImage: {
+    width: '100%',
     height: 150,
-    backgroundColor: '#00BFFF', // Color azul cian como en la imagen (puedes usar un gradiente real si es necesario)
+    borderTopLeftRadius: borderRadius.lg,
+    borderTopRightRadius: borderRadius.lg,
+    backgroundColor: colors.borderLight,
   },
-  planContent: {
-    padding: spacing.md,
+  planImagePlaceholder: {
+    width: '100%',
+    height: 150,
+    borderTopLeftRadius: borderRadius.lg,
+    borderTopRightRadius: borderRadius.lg,
+    backgroundColor: colors.borderLight,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   planTitle: {
     fontSize: fontSize.xl,
@@ -202,48 +206,7 @@ const styles = StyleSheet.create({
     color: colors.primary,
     marginBottom: spacing.md,
   },
-  featuresContainer: {
-    marginBottom: spacing.lg,
-  },
-  featureBadge: {
-    backgroundColor: '#FFF9C4', // Amarillo claro
-    borderRadius: borderRadius.round,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
-    alignSelf: 'flex-start',
-    marginBottom: spacing.sm,
-  },
-  featureBadgeText: {
-    fontSize: fontSize.sm,
-    color: colors.textPrimary,
-    fontWeight: '600',
-  },
-  featureDescription: {
-    fontSize: fontSize.md,
-    color: colors.textSecondary,
-    marginBottom: spacing.sm,
-  },
-  featureIcons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  featureIcon: {
-    fontSize: fontSize.sm,
-    color: colors.textSecondary,
-  },
-  button: {
-    borderRadius: borderRadius.lg,
-    paddingVertical: spacing.lg,
-    alignItems: "center",
-    justifyContent: "center",
-    ...shadows.medium,
-  },
-  buttonPrimary: {
-    backgroundColor: colors.primary, // Azul
-  },
-  buttonText: {
-    color: colors.white,
-    fontSize: fontSize.md,
-    fontWeight: "600",
+  verMasButton: {
+    marginVertical: spacing.md,
   },
 });
