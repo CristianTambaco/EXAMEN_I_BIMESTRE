@@ -57,15 +57,15 @@ export default function DetallePlanScreen() {
 
   const handleContratar = async () => {
     if (!usuario) {
-      Alert.alert("Error", "Debes iniciar sesión para contratar.");
+      Alert.alert("Debes iniciar sesión para continuar.");
       return;
     }
     if (!plan) {
       Alert.alert("Error", "Plan no disponible.");
       return;
     }
-    Alert.alert("Éxito", "¡Solicitud de contratación enviada! Espera la aprobación del asesor.");
-    router.push("/(tabs)/rutinasAsignadas");
+    
+    router.push("/(tabs)/misPlanes"); 
   };
 
   if (cargando) {
