@@ -10,6 +10,8 @@ export function useAuth() {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
   const [cargando, setCargando] = useState(true);
 
+  const [cargandoActualizar, setCargandoActualizar] = useState(false); // Nuevo estado
+
   useEffect(() => {
     verificarSesionInicial();
     const { data: subscription } = authUseCase.onAuthStateChange(
@@ -99,9 +101,27 @@ export function useAuth() {
     return { success: false, error: "No hay datos de rol pendientes" };
   };
 
+  const actualizarPerfil = async (nombre?: string, telefono?: string) => {
+    if (!usuario?.id) {
+      return { success: false, error: "Usuario no autenticado" };
+    }
+
+    setCargandoActualizar(true);
+    const resultado = await authUseCase.actualizarPerfil(usuario.id, nombre, telefono);
+    if (resultado.success && resultado.usuario) {
+      setUsuario(resultado.usuario); // Actualiza el estado local
+    }
+    setCargandoActualizar(false);
+    return resultado;
+  };
+
+
+
   return {
     usuario,
     cargando,
+    cargandoActualizar,
+    actualizarPerfil,
     registrar,
     iniciarSesion,
     cerrarSesion,

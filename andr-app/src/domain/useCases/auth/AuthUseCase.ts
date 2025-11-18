@@ -138,6 +138,31 @@ export class AuthUseCase {
     }
   }
 
+ // Método para actualizar el perfil del usuario
+  async actualizarPerfil(userId: string, nombre?: string, telefono?: string) {
+    try {
+      const updates: Partial<Usuario> = {};
+      if (nombre !== undefined) updates.nombre = nombre;
+      if (telefono !== undefined) updates.telefono = telefono; // Asegúrate de que 'telefono' esté en tu interfaz Usuario
+
+      const { error } = await supabase
+        .from("usuarios")
+        .update(updates)
+        .eq("id", userId);
+
+      if (error) throw error;
+
+      // Opcional: Obtener y devolver el usuario actualizado
+      const usuarioActualizado = await this.obtenerUsuarioActual();
+      return { success: true, usuario: usuarioActualizado };
+    } catch (error: any) {
+      console.error("Error en AuthUseCase.actualizarPerfil:", error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  
+
   onAuthStateChange(callback: (usuario: Usuario | null) => void) {
     return supabase.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
