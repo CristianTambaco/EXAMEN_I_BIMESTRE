@@ -64,11 +64,12 @@ export class PlanesUseCase {
     }
   }
 
-  async eliminarPlan(id: string): Promise<{ success: boolean; error?: string }> {
+  // Método para eliminar físicamente el plan de la base de datos
+  async eliminarPlanFisico(id: string): Promise<{ success: boolean; error?: string }> {
     try {
       const { error } = await supabase
         .from("planes_moviles")
-        .update({ activo: false })
+        .delete()
         .eq("id", id);
       if (error) throw error;
       return { success: true };
@@ -76,4 +77,5 @@ export class PlanesUseCase {
       return { success: false, error: error.message };
     }
   }
+
 }

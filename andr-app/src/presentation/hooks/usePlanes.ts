@@ -41,9 +41,10 @@ export function usePlanes() {
 
   //  MODIFICACIÓN: La función eliminar ahora recarga la lista
   const eliminar = async (id: string) => {
-    const resultado = await planesUseCase.eliminarPlan(id);
+    const resultado = await planesUseCase.eliminarPlanFisico(id); // <-- Usar la nueva función
     if (resultado.success) {
-      
+      // Actualizar el estado local eliminando el plan de la lista
+      setPlanes(prevPlanes => prevPlanes.filter(plan => plan.id !== id));
     }
     return resultado;
   };
