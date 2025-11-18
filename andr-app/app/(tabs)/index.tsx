@@ -134,7 +134,7 @@ export default function HomeScreen() {
       </View>
 
       {/* Sección de Planes Disponibles */}
-      <Text style={styles.sectionTitle}>Planes Disponibles</Text>
+      <Text style={styles.sectionTitle}>{esAsesorComercial ? "Planes" : "Planes disponibles"}</Text>
       <FlatList
         data={planes}
         keyExtractor={(item) => item.id}
