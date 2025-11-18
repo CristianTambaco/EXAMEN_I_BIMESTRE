@@ -1,4 +1,4 @@
-// app/detallePlan.tsx
+// app/detallePlan.tsx (Modificado)
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
@@ -17,6 +17,8 @@ import {
   colors,
   fontSize,
   spacing,
+  borderRadius,
+  shadows
 } from "../src/styles/theme";
 import { supabase } from "../src/data/services/supabaseClient";
 import { Plan } from "../src/domain/models/Plan";
@@ -91,76 +93,110 @@ export default function DetallePlanScreen() {
 
   return (
     <ScrollView style={globalStyles.container}>
-      <View style={globalStyles.contentPadding}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.back()}>
-            <Text style={styles.botonVolver}>← Volver</Text>
+      <View style={styles.planCard}>
+        {/* Encabezado con gradiente (simulado con color sólido o imagen) */}
+        <View style={styles.headerGradient}>
+          {/* Aquí podrías usar una imagen o un gradiente real si es necesario */}
+        </View>
+
+        <View style={styles.planContent}>
+          <Text style={styles.planTitle}>{plan.nombre_comercial}</Text>
+          <Text style={styles.planPrice}>${plan.precio}/mes</Text>
+
+          {/* Características del plan */}
+          <View style={styles.featuresContainer}>
+            <View style={styles.featureBadge}>
+              <Text style={styles.featureBadgeText}>Redes sociales gratis</Text>
+            </View>
+            <Text style={styles.featureDescription}>Sin límites para tu conexión</Text>
+            <View style={styles.featureIcons}>
+              <Text style={styles.featureIcon}>📱 Ilimitado</Text>
+              <Text style={styles.featureIcon}>📞 Ilimitado</Text>
+            </View>
+          </View>
+
+          {/* Botón "Ver Detalles" */}
+          <TouchableOpacity
+            style={[styles.button, styles.buttonPrimary]}
+            onPress={handleContratar}
+          >
+            <Text style={styles.buttonText}>Ver Detalles</Text>
           </TouchableOpacity>
-          <Text style={globalStyles.title}>{plan.nombre_comercial}</Text>
         </View>
-        <Text style={styles.precio}>${plan.precio}/mes</Text>
-        <View style={styles.detalleContainer}>
-            <Text style={styles.detalleTitulo}>Información Básica</Text>
-            <Text style={globalStyles.textSecondary}>Segmento: {plan.segmento}</Text>
-            <Text style={globalStyles.textSecondary}>Público Objetivo: {plan.publico_objetivo}</Text>
-        </View>
-        <View style={styles.detalleContainer}>
-            <Text style={styles.detalleTitulo}>Características Técnicas</Text>
-            <Text style={globalStyles.textSecondary}>Datos Móviles: {plan.datos_móviles}</Text>
-            <Text style={globalStyles.textSecondary}>Minutos de Voz: {plan.minutos_voz}</Text>
-            <Text style={globalStyles.textSecondary}>SMS: {plan.sms}</Text>
-            <Text style={globalStyles.textSecondary}>Velocidad 4G: {plan.velocidad_4g}</Text>
-            <Text style={globalStyles.textSecondary}>Redes Sociales: {plan.redes_sociales}</Text>
-            <Text style={globalStyles.textSecondary}>WhatsApp: {plan.whatsapp}</Text>
-            <Text style={globalStyles.textSecondary}>Llamadas Internacionales: {plan.llamadas_internacionales}</Text>
-            <Text style={globalStyles.textSecondary}>Roaming: {plan.roaming}</Text>
-        </View>
-        {usuario && (
-            <TouchableOpacity
-              style={[
-                globalStyles.button,
-                globalStyles.buttonPrimary,
-                styles.botonContratar,
-              ]}
-              onPress={handleContratar}
-            >
-              <Text style={globalStyles.buttonText}>Contratar Plan</Text>
-            </TouchableOpacity>
-        )}
       </View>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  header: {
-    marginBottom: spacing.lg,
-  },
-  botonVolver: {
-    fontSize: fontSize.md,
-    color: colors.primary,
-    marginBottom: spacing.sm,
-  },
-  precio: {
-    fontSize: fontSize.xxl,
-    fontWeight: "bold",
-    color: colors.primary,
-    marginBottom: spacing.lg,
-  },
-  detalleContainer: {
-    marginBottom: spacing.lg,
-    padding: spacing.md,
+  planCard: {
+    margin: spacing.md,
+    borderRadius: borderRadius.lg,
+    overflow: 'hidden',
     backgroundColor: colors.white,
-    borderRadius: 8,
+    ...shadows.medium,
   },
-  detalleTitulo: {
-    fontSize: fontSize.lg,
-    fontWeight: "600",
+  headerGradient: {
+    height: 150,
+    backgroundColor: '#00BFFF', // Color azul cian como en la imagen (puedes usar un gradiente real)
+  },
+  planContent: {
+    padding: spacing.md,
+  },
+  planTitle: {
+    fontSize: fontSize.xl,
+    fontWeight: 'bold',
     color: colors.textPrimary,
     marginBottom: spacing.sm,
   },
-  botonContratar: {
-    padding: spacing.lg,
-    marginTop: spacing.md,
+  planPrice: {
+    fontSize: fontSize.xxxl,
+    fontWeight: 'bold',
+    color: colors.primary,
+    marginBottom: spacing.md,
+  },
+  featuresContainer: {
+    marginBottom: spacing.lg,
+  },
+  featureBadge: {
+    backgroundColor: '#FFF9C4', // Amarillo claro
+    borderRadius: borderRadius.round,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    alignSelf: 'flex-start',
+    marginBottom: spacing.sm,
+  },
+  featureBadgeText: {
+    fontSize: fontSize.sm,
+    color: colors.textPrimary,
+    fontWeight: '600',
+  },
+  featureDescription: {
+    fontSize: fontSize.md,
+    color: colors.textSecondary,
+    marginBottom: spacing.sm,
+  },
+  featureIcons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  featureIcon: {
+    fontSize: fontSize.sm,
+    color: colors.textSecondary,
+  },
+  button: {
+    borderRadius: borderRadius.lg,
+    paddingVertical: spacing.lg,
+    alignItems: "center",
+    justifyContent: "center",
+    ...shadows.medium,
+  },
+  buttonPrimary: {
+    backgroundColor: colors.primary, // Azul
+  },
+  buttonText: {
+    color: colors.white,
+    fontSize: fontSize.md,
+    fontWeight: "600",
   },
 });

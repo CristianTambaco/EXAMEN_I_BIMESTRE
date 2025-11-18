@@ -1,4 +1,4 @@
-// app/auth/login.tsx
+// app/auth/login.tsx (Modificado)
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import { useAuth } from "../../src/presentation/hooks/useAuth";
 import { globalStyles } from "../../src/styles/globalStyles";
-import { colors, fontSize, spacing } from "../../src/styles/theme";
+import { colors, fontSize, spacing, borderRadius, shadows } from "../../src/styles/theme";
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
@@ -39,13 +39,28 @@ export default function LoginScreen() {
     }
   };
 
+  const handleLoginAsesor = async () => {
+    // Para este caso, simplemente inicia sesión normalmente.
+    // La lógica de rol se maneja en el hook useAuth y en el layout.
+    // Este botón solo cambia el texto y podría tener una lógica diferente si se requiere.
+    handleLogin();
+  };
+
   return (
-    <View style={globalStyles.container}>
+    <View style={styles.container}>
+      {/* Barra superior con "Invitado" y "Volver" */}
+      <View style={styles.headerBar}>
+        <Text style={styles.invitadoLabel}>Invitado</Text>
+        <TouchableOpacity onPress={() => router.push("/")}>
+          <Text style={styles.volverButton}>← Volver</Text>
+        </TouchableOpacity>
+      </View>
+
       <View style={globalStyles.contentPadding}>
-        <Text style={styles.titulo}>Iniciar sesión</Text>
-        <Text style={styles.subtitulo}>Inicia sesión para continuar</Text>
+        <Text style={styles.titulo}>Iniciar Sesión</Text>
+
         <TextInput
-          style={globalStyles.input}
+          style={[globalStyles.input, styles.inputField]}
           placeholder="Email"
           value={email}
           onChangeText={setEmail}
@@ -53,45 +68,41 @@ export default function LoginScreen() {
           keyboardType="email-address"
         />
         <TextInput
-          style={globalStyles.input}
+          style={[globalStyles.input, styles.inputField]}
           placeholder="Contraseña"
           value={password}
           onChangeText={setPassword}
           secureTextEntry
         />
-        <View style={styles.recordarSesionContainer}>
-          <Switch
-            value={recordarSesion}
-            onValueChange={setRecordarSesion}
-            trackColor={{ false: colors.border, true: colors.primary }}
-            thumbColor={recordarSesion ? colors.white : colors.white}
-          />
-          <Text style={styles.recordarSesionTexto}>Recordar sesión</Text>
-        </View>
+
+        {/* Botones de inicio de sesión */}
         <TouchableOpacity
-          style={[
-            globalStyles.button,
-            globalStyles.buttonPrimary,
-            styles.botonLogin,
-          ]}
+          style={[styles.button, styles.buttonPrimary]}
           onPress={handleLogin}
           disabled={cargando}
         >
           {cargando ? (
             <ActivityIndicator color={colors.white} />
           ) : (
-            <Text style={globalStyles.buttonText}>Iniciar Sesión</Text>
+            <Text style={styles.buttonText}>Ingresar como Usuario</Text>
           )}
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => router.push("/auth/registro")}>
-          <Text style={styles.linkRegistro}>
-            ¿No tienes cuenta? Regístrate aquí
-          </Text>
+
+        <TouchableOpacity
+          style={[styles.button, styles.buttonSecondary]}
+          onPress={handleLoginAsesor}
+          disabled={cargando}
+        >
+          {cargando ? (
+            <ActivityIndicator color={colors.white} />
+          ) : (
+            <Text style={styles.buttonText}>Ingresar como Asesor</Text>
+          )}
         </TouchableOpacity>
+
+        {/* Enlace de olvido de contraseña */}
         <TouchableOpacity onPress={() => router.push("/auth/reestablecer")}>
-          <Text style={styles.linkRegistro}>
-            ¿Olvidaste tu contraseña?
-          </Text>
+          <Text style={styles.linkOlvidaste}>¿Olvidaste tu contraseña?</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -99,38 +110,64 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  headerBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.xl,
+    paddingBottom: spacing.sm,
+    backgroundColor: colors.primary, // Azul intenso como en la imagen
+  },
+  invitadoLabel: {
+    fontSize: fontSize.sm,
+    color: colors.white,
+    fontWeight: 'bold',
+  },
+  volverButton: {
+    fontSize: fontSize.md,
+    color: colors.white,
+    fontWeight: 'bold',
+  },
   titulo: {
     fontSize: fontSize.xxxl,
     fontWeight: "bold",
     textAlign: "center",
-    marginBottom: spacing.sm,
+    marginBottom: spacing.lg,
     marginTop: spacing.xxl * 2,
     color: colors.textPrimary,
   },
-  subtitulo: {
+  inputField: {
+    marginBottom: spacing.md,
+  },
+  button: {
+    borderRadius: borderRadius.lg,
+    paddingVertical: spacing.lg,
+    alignItems: "center",
+    justifyContent: "center",
+    ...shadows.medium,
+    marginVertical: spacing.sm,
+  },
+  buttonPrimary: {
+    backgroundColor: colors.primary, // Azul
+  },
+  buttonSecondary: {
+    backgroundColor: colors.secondary, // Verde
+  },
+  buttonText: {
+    color: colors.white,
     fontSize: fontSize.md,
-    textAlign: "center",
-    marginBottom: spacing.xl,
-    color: colors.textSecondary,
+    fontWeight: "600",
   },
-  botonLogin: {
-    marginTop: spacing.sm,
-  },
-  linkRegistro: {
+  linkOlvidaste: {
     textAlign: "center",
     marginTop: spacing.lg,
     color: colors.primary,
     fontSize: fontSize.sm,
-  },
-  recordarSesionContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: spacing.md,
-    marginBottom: spacing.sm,
-  },
-  recordarSesionTexto: {
-    marginLeft: spacing.sm,
-    fontSize: fontSize.md,
-    color: colors.textPrimary,
+    textDecorationLine: 'underline',
   },
 });

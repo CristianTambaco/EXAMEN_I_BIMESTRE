@@ -1,9 +1,11 @@
-// app/(asesor)/_layout.tsx
+// app/(asesor)/_layout.tsx (Modificado)
 import { Tabs } from "expo-router";
 import React from "react";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+
+import { colors, fontSize } from "@/src/styles/theme";
 
 export default function AsesorLayout() {
   const colorScheme = useColorScheme();
@@ -12,6 +14,15 @@ export default function AsesorLayout() {
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
         headerShown: false,
+        tabBarStyle: {
+          backgroundColor: colors.white,
+          borderTopWidth: 1,
+          borderTopColor: colors.borderLight,
+        },
+        tabBarLabelStyle: {
+          fontSize: fontSize.sm,
+          fontWeight: '600',
+        },
       }}
     >
       <Tabs.Screen
@@ -19,23 +30,23 @@ export default function AsesorLayout() {
         options={{
           title: "Planes",
           tabBarIcon: ({ color }) => (
-            <MaterialIcons name="dashboard" size={28} color={color} />
+            <MaterialIcons name="shopping-cart" size={28} color={color} />
           ),
         }}
       />
       <Tabs.Screen
-        name="contratacionesPendientes"
+        name="contratacion/pendientes"
         options={{
-          title: "Contrataciones",
+          title: "Solicitudes",
           tabBarIcon: ({ color }) => (
-            <MaterialIcons name="pending-actions" size={28} color={color} />
+            <MaterialIcons name="receipt" size={28} color={color} />
           ),
         }}
       />
       <Tabs.Screen
         name="chat"
         options={{
-          title: "Chat",
+          title: "Chats",
           tabBarIcon: ({ color }) => (
             <MaterialIcons name="message" size={28} color={color} />
           ),

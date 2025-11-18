@@ -1,4 +1,4 @@
-// app/plan/crear.tsx
+// app/plan/crear.tsx (Modificado)
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -18,6 +18,7 @@ import {
   colors,
   fontSize,
   spacing,
+  borderRadius,
 } from "../../src/styles/theme";
 
 export default function CrearPlanScreen() {
@@ -27,43 +28,38 @@ export default function CrearPlanScreen() {
 
   const [nombre, setNombre] = useState("");
   const [precio, setPrecio] = useState("");
-  const [segmento, setSegmento] = useState("");
-  const [publicoObjetivo, setPublicoObjetivo] = useState("");
   const [datosMoviles, setDatosMoviles] = useState("");
   const [minutosVoz, setMinutosVoz] = useState("");
-  const [sms, setSms] = useState("");
-  const [velocidad4g, setVelocidad4g] = useState("");
-  const [redesSociales, setRedesSociales] = useState("");
-  const [whatsapp, setWhatsapp] = useState("");
-  const [llamadasInternacionales, setLlamadasInternacionales] = useState("");
-  const [roaming, setRoaming] = useState("");
+  const [promocion, setPromocion] = useState("");
+  const [descripcion, setDescripcion] = useState("");
   const [cargando, setCargando] = useState(false);
 
   const handleCrear = async () => {
-    if (!nombre || !precio) {
-      Alert.alert("Error", "Completa los campos obligatorios (Nombre y Precio)");
+    if (!nombre || !precio || !datosMoviles || !minutosVoz) {
+      Alert.alert("Error", "Completa todos los campos obligatorios");
       return;
     }
     if (!usuario) {
-        Alert.alert("Error", "Usuario no autenticado");
-        return;
+      Alert.alert("Error", "Usuario no autenticado");
+      return;
     }
     setCargando(true);
     const planData = {
-        nombre_comercial: nombre,
-        precio: parseFloat(precio),
-        segmento,
-        publico_objetivo: publicoObjetivo,
-        datos_móviles: datosMoviles,
-        minutos_voz: minutosVoz,
-        sms,
-        velocidad_4g: velocidad4g,
-        redes_sociales: redesSociales,
-        whatsapp,
-        llamadas_internacionales: llamadasInternacionales,
-        roaming,
-        asesor_id: usuario.id,
-        activo: true,
+      nombre_comercial: nombre,
+      precio: parseFloat(precio),
+      segmento: "General",
+      publico_objetivo: descripcion,
+      datos_móviles: datosMoviles,
+      minutos_voz: minutosVoz,
+      sms: "0",
+      velocidad_4g: "10 Mbps",
+      redes_sociales: "Sí",
+      whatsapp: "Sí",
+      llamadas_internacionales: "No",
+      roaming: "No",
+      promocion: promocion,
+      asesor_id: usuario.id,
+      activo: true,
     };
     const resultado = await crear(planData);
     setCargando(false);
@@ -72,7 +68,7 @@ export default function CrearPlanScreen() {
         {
           text: "OK",
           onPress: () => {
-            router.push("/(tabs)/misPlanes");
+            router.push("/(asesor)/dashboard");
           },
         },
       ]);
@@ -84,8 +80,8 @@ export default function CrearPlanScreen() {
   if (!esAsesorComercial) {
     return (
       <View style={globalStyles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.push("/(tabs)")}>
+        <View style={styles.headerBar}>
+          <TouchableOpacity onPress={() => router.push("/(asesor)/dashboard")}>
             <Text style={styles.botonVolver}>← Volver</Text>
           </TouchableOpacity>
         </View>
@@ -100,31 +96,74 @@ export default function CrearPlanScreen() {
 
   return (
     <ScrollView style={globalStyles.container}>
+      {/* Barra superior */}
+      <View style={styles.headerBar}>
+        <TouchableOpacity onPress={() => router.push("/(asesor)/dashboard")}>
+          <Text style={styles.botonVolver}>← Volver</Text>
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Crear Nuevo Plan</Text>
+      </View>
+
       <View style={globalStyles.contentPadding}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.push("/(tabs)/misPlanes")}>
-            <Text style={styles.botonVolver}>← Volver</Text>
-          </TouchableOpacity>
-          <Text style={globalStyles.title}>Nuevo Plan</Text>
+        {/* Formulario */}
+        <TextInput
+          style={[globalStyles.input, styles.inputField]}
+          placeholder="Nombre del Plan"
+          value={nombre}
+          onChangeText={setNombre}
+          placeholderTextColor={colors.textSecondary}
+        />
+        <View style={styles.rowInputs}>
+          <TextInput
+            style={[globalStyles.input, styles.inputField, styles.halfInput]}
+            placeholder="Precio Mensual ($)"
+            value={precio}
+            onChangeText={setPrecio}
+            keyboardType="decimal-pad"
+            placeholderTextColor={colors.textSecondary}
+          />
+          <TextInput
+            style={[globalStyles.input, styles.inputField, styles.halfInput]}
+            placeholder="Gigas de Datos"
+            value={datosMoviles}
+            onChangeText={setDatosMoviles}
+            keyboardType="numeric"
+            placeholderTextColor={colors.textSecondary}
+          />
         </View>
-        <TextInput style={globalStyles.input} placeholder="Nombre Comercial *" value={nombre} onChangeText={setNombre} />
-        <TextInput style={globalStyles.input} placeholder="Precio *" value={precio} onChangeText={setPrecio} keyboardType="numeric" />
-        <TextInput style={globalStyles.input} placeholder="Segmento" value={segmento} onChangeText={setSegmento} />
-        <TextInput style={globalStyles.input} placeholder="Público Objetivo" value={publicoObjetivo} onChangeText={setPublicoObjetivo} />
-        <TextInput style={globalStyles.input} placeholder="Datos Móviles" value={datosMoviles} onChangeText={setDatosMoviles} />
-        <TextInput style={globalStyles.input} placeholder="Minutos de Voz" value={minutosVoz} onChangeText={setMinutosVoz} />
-        <TextInput style={globalStyles.input} placeholder="SMS" value={sms} onChangeText={setSms} />
-        <TextInput style={globalStyles.input} placeholder="Velocidad 4G" value={velocidad4g} onChangeText={setVelocidad4g} />
-        <TextInput style={globalStyles.input} placeholder="Redes Sociales" value={redesSociales} onChangeText={setRedesSociales} />
-        <TextInput style={globalStyles.input} placeholder="WhatsApp" value={whatsapp} onChangeText={setWhatsapp} />
-        <TextInput style={globalStyles.input} placeholder="Llamadas Internacionales" value={llamadasInternacionales} onChangeText={setLlamadasInternacionales} />
-        <TextInput style={globalStyles.input} placeholder="Roaming" value={roaming} onChangeText={setRoaming} />
+        <TextInput
+          style={[globalStyles.input, styles.inputField]}
+          placeholder="Minutos de Llamadas"
+          value={minutosVoz}
+          onChangeText={setMinutosVoz}
+          keyboardType="numeric"
+          placeholderTextColor={colors.textSecondary}
+        />
+        <TextInput
+          style={[globalStyles.input, styles.inputField, styles.multilineInput]}
+          placeholder="Descripción"
+          value={descripcion}
+          onChangeText={setDescripcion}
+          multiline
+          numberOfLines={4}
+          placeholderTextColor={colors.textSecondary}
+        />
+        <TextInput
+          style={[globalStyles.input, styles.inputField]}
+          placeholder="Promoción (Opcional)"
+          value={promocion}
+          onChangeText={setPromocion}
+          placeholderTextColor={colors.textSecondary}
+        />
+
+        {/* Imagen del Plan (Placeholder) */}
+        <Text style={styles.imageLabel}>Imagen del Plan</Text>
+        <View style={styles.imagePlaceholder}>
+          <Text style={styles.imagePlaceholderText}>🖼️</Text>
+        </View>
+
         <TouchableOpacity
-          style={[
-            globalStyles.button,
-            globalStyles.buttonPrimary,
-            styles.botonCrear,
-          ]}
+          style={[globalStyles.button, globalStyles.buttonPrimary, styles.botonCrear]}
           onPress={handleCrear}
           disabled={cargando}
         >
@@ -140,15 +179,65 @@ export default function CrearPlanScreen() {
 }
 
 const styles = StyleSheet.create({
-  header: {
-    marginTop: spacing.lg,
-    marginBottom: spacing.lg,
-    padding: spacing.sm,
+  headerBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: colors.primary,
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.sm,
   },
   botonVolver: {
     fontSize: fontSize.md,
-    color: colors.primary,
+    color: colors.white,
+    fontWeight: 'bold',
+  },
+  headerTitle: {
+    fontSize: fontSize.xl,
+    fontWeight: 'bold',
+    color: colors.white,
+    textAlign: 'center',
+    flex: 1,
+  },
+  inputField: {
+    marginBottom: spacing.md,
+  },
+  rowInputs: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: spacing.md,
+  },
+  halfInput: {
+    flex: 1,
+    marginRight: spacing.sm,
+  },
+  multilineInput: {
+    minHeight: 100,
+    textAlignVertical: 'top',
+  },
+  imageLabel: {
+    fontSize: fontSize.md,
+    fontWeight: '600',
+    color: colors.textPrimary,
     marginBottom: spacing.sm,
+  },
+  imagePlaceholder: {
+    width: '100%',
+    height: 150,
+    backgroundColor: colors.borderLight,
+    borderRadius: borderRadius.lg,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: spacing.lg,
+  },
+  imagePlaceholderText: {
+    fontSize: fontSize.xxxl,
+    color: colors.textSecondary,
+  },
+  botonCrear: {
+    marginTop: spacing.md,
+    padding: spacing.lg,
   },
   textoNoAsesor: {
     fontSize: fontSize.xl,
@@ -156,9 +245,5 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: colors.textPrimary,
     marginBottom: spacing.sm,
-  },
-  botonCrear: {
-    marginTop: spacing.sm,
-    padding: spacing.lg,
   },
 });

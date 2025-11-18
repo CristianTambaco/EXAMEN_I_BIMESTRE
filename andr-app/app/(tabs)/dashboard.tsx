@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
-  Alert, // 👈 Importa Alert
+  Alert, // 
 } from "react-native";
 import { usePlanes } from "../../src/presentation/hooks/usePlanes";
 import { globalStyles } from "../../src/styles/globalStyles";
@@ -16,7 +16,7 @@ import { colors, spacing } from "../../src/styles/theme";
 import { useAuth } from "../../src/presentation/hooks/useAuth";
 
 export default function DashboardAsesor() {
-  const { planes, cargando, cargarPlanesAsesor, eliminar } = usePlanes(); // 👈 Importa 'eliminar' del hook
+  const { planes, cargando, cargarPlanesAsesor, eliminar } = usePlanes(); //  Importa 'eliminar' del hook
   const { usuario } = useAuth();
   const router = useRouter();
 

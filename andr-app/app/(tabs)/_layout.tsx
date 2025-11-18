@@ -1,10 +1,13 @@
-// app/(tabs)/_layout.tsx
+// app/(tabs)/_layout.tsx (Modificado)
 import { Tabs } from "expo-router";
 import React from "react";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useAuth } from "../../src/presentation/hooks/useAuth";
+
+
+import { colors, fontSize } from "@/src/styles/theme";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -16,14 +19,16 @@ export default function TabLayout() {
         screenOptions={{
           tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
           headerShown: false,
+          tabBarLabelStyle: { fontSize: fontSize.sm, fontWeight: '600' }, 
+          tabBarStyle: { backgroundColor: colors.white, borderTopWidth: 1, borderTopColor: colors.borderLight },
         }}
       >
         <Tabs.Screen
           name="index"
           options={{
-            title: "Dashboard",
+            title: "Inicio",
             tabBarIcon: ({ color }) => (
-              <MaterialIcons name="dashboard" size={28} color={color} />
+              <MaterialIcons name="home" size={28} color={color} />
             ),
           }}
         />
@@ -73,6 +78,8 @@ export default function TabLayout() {
         screenOptions={{
           tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
           headerShown: false,
+          tabBarLabelStyle: { fontSize: fontSize.sm, fontWeight: '600' },
+          tabBarStyle: { backgroundColor: colors.white, borderTopWidth: 1, borderTopColor: colors.borderLight },
         }}
       >
         <Tabs.Screen

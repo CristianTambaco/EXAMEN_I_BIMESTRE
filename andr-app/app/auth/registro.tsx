@@ -1,4 +1,4 @@
-// app/auth/registro.tsx
+// app/auth/registro.tsx (Modificado)
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -17,6 +17,7 @@ import {
   colors,
   fontSize,
   spacing,
+  shadows
 } from "../../src/styles/theme";
 
 export default function RegistroScreen() {
@@ -50,17 +51,26 @@ export default function RegistroScreen() {
   };
 
   return (
-    <View style={globalStyles.container}>
+    <View style={styles.container}>
+      {/* Barra superior con "Invitado" y "Volver" */}
+      <View style={styles.headerBar}>
+        <Text style={styles.invitadoLabel}>Invitado</Text>
+        <TouchableOpacity onPress={() => router.push("/")}>
+          <Text style={styles.volverButton}>← Volver</Text>
+        </TouchableOpacity>
+      </View>
+
       <View style={globalStyles.contentPadding}>
-        <Text style={globalStyles.title}>Registro</Text>
+        <Text style={styles.titulo}>Registro</Text>
+
         <TextInput
-          style={globalStyles.input}
+          style={[globalStyles.input, styles.inputField]}
           placeholder="Nombre Completo"
           value={nombre}
           onChangeText={setNombre}
         />
         <TextInput
-          style={globalStyles.input}
+          style={[globalStyles.input, styles.inputField]}
           placeholder="Email"
           value={email}
           onChangeText={setEmail}
@@ -68,32 +78,30 @@ export default function RegistroScreen() {
           keyboardType="email-address"
         />
         <TextInput
-          style={globalStyles.input}
+          style={[globalStyles.input, styles.inputField]}
           placeholder="Teléfono"
           value={telefono}
           onChangeText={setTelefono}
           keyboardType="phone-pad"
         />
         <TextInput
-          style={globalStyles.input}
+          style={[globalStyles.input, styles.inputField]}
           placeholder="Contraseña (mínimo 6 caracteres)"
           value={password}
           onChangeText={setPassword}
           secureTextEntry
         />
+
         <TouchableOpacity
-          style={[globalStyles.button, globalStyles.buttonPrimary]}
+          style={[styles.button, styles.buttonPrimary]}
           onPress={handleRegistro}
           disabled={cargando}
         >
           {cargando ? (
             <ActivityIndicator color={colors.white} />
           ) : (
-            <Text style={globalStyles.buttonText}>Crear Cuenta</Text>
+            <Text style={styles.buttonText}>Crear Cuenta</Text>
           )}
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Text style={styles.linkVolver}>Volver al inicio de sesión</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -101,10 +109,54 @@ export default function RegistroScreen() {
 }
 
 const styles = StyleSheet.create({
-  linkVolver: {
-    textAlign: "center",
-    marginTop: spacing.lg,
-    color: colors.primary,
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  headerBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.xl,
+    paddingBottom: spacing.sm,
+    backgroundColor: colors.primary, // Azul intenso como en la imagen
+  },
+  invitadoLabel: {
     fontSize: fontSize.sm,
+    color: colors.white,
+    fontWeight: 'bold',
+  },
+  volverButton: {
+    fontSize: fontSize.md,
+    color: colors.white,
+    fontWeight: 'bold',
+  },
+  titulo: {
+    fontSize: fontSize.xxxl,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: spacing.lg,
+    marginTop: spacing.xxl * 2,
+    color: colors.textPrimary,
+  },
+  inputField: {
+    marginBottom: spacing.md,
+  },
+  button: {
+    borderRadius: borderRadius.lg,
+    paddingVertical: spacing.lg,
+    alignItems: "center",
+    justifyContent: "center",
+    ...shadows.medium,
+    marginVertical: spacing.sm,
+  },
+  buttonPrimary: {
+    backgroundColor: colors.primary, // Azul
+  },
+  buttonText: {
+    color: colors.white,
+    fontSize: fontSize.md,
+    fontWeight: "600",
   },
 });
