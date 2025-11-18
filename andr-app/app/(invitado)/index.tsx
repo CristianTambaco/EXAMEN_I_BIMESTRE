@@ -8,7 +8,7 @@ import {
   StyleSheet,
 } from "react-native";
 import { globalStyles } from "../../src/styles/globalStyles";
-import { colors, spacing } from "../../src/styles/theme";
+import { colors, fontSize, spacing } from "../../src/styles/theme";
 
 export default function HomeInvitado() {
   const router = useRouter();
@@ -40,10 +40,11 @@ export default function HomeInvitado() {
 
 const styles = StyleSheet.create({
   titulo: {
-    fontSize: 32,
+    fontSize: fontSize.xxxl,
     fontWeight: "bold",
-    color: colors.textPrimary,
+    textAlign: "center",
     marginBottom: spacing.md,
+    color: colors.white,
   },
   botonExplorar: {
     width: "80%",
@@ -52,9 +53,15 @@ const styles = StyleSheet.create({
   botonIniciarSesion: {
     width: "80%",
     marginVertical: spacing.sm,
+    backgroundColor: colors.white,
+    borderColor: colors.primary,
+    borderWidth: 2,
   },
   botonRegistrarse: {
     width: "80%",
     marginVertical: spacing.sm,
+    backgroundColor: colors.borderLight,
+    borderColor: colors.border,
+    borderWidth: 2,
   },
 });
