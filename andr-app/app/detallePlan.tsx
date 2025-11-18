@@ -68,7 +68,7 @@ export default function DetallePlanScreen() {
     }
 
 
-    router.push("/(tabs)/misPlanes"); 
+    router.push("/(tabs)/chat"); 
   };
 
   if (cargando) {
@@ -123,7 +123,7 @@ export default function DetallePlanScreen() {
             style={[styles.button, styles.buttonPrimary]}
             onPress={handleContratar}
           >
-            <Text style={styles.buttonText}>Ver otros planes</Text>
+            <Text style={styles.buttonText}>Contactar</Text>
           </TouchableOpacity>
 
         </View>
