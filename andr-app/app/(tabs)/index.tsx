@@ -1,4 +1,4 @@
-// app/(tabs)/index.tsx
+// app/(tabs)/index.tsx (Modificado para coincidir con el diseño de la segunda imagen)
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -13,18 +13,18 @@ import {
 } from "react-native";
 import { useAuth } from "../../src/presentation/hooks/useAuth";
 import { usePlanes } from "../../src/presentation/hooks/usePlanes";
-import { useContrataciones } from "../../src/presentation/hooks/useContrataciones";
 import { globalStyles } from "../../src/styles/globalStyles";
 import {
   colors,
   fontSize,
   spacing,
+  borderRadius,
+  shadows
 } from "../../src/styles/theme";
 
 export default function HomeScreen() {
   const { usuario, esUsuarioRegistrado, esAsesorComercial, cerrarSesion } = useAuth();
   const { planes, cargarPlanesPublicos, cargarPlanesAsesor } = usePlanes();
-  const { cargarContratacionesUsuario } = useContrataciones();
   const [cargando, setCargando] = useState(true);
   const [refrescando, setRefrescando] = useState(false);
   const router = useRouter();
@@ -65,6 +65,44 @@ export default function HomeScreen() {
     setRefrescando(false);
   };
 
+  // Función para renderizar un plan en formato de tarjeta (como en la segunda imagen)
+  const renderItem = ({ item }: { item: any }) => (
+    <View style={styles.planCard}>
+      {/* Encabezado con gradiente  */}
+      <View style={styles.headerGradient} />
+      <View style={styles.planContent}>
+        <Text style={styles.planTitle}>{item.nombre_comercial}</Text>
+        <Text style={styles.planPrice}>${item.precio}/mes</Text>
+        {/* Características del plan */}
+        <View style={styles.featuresContainer}>
+
+          {item.redes_sociales && (
+            <View style={styles.featureBadge}>
+              <Text style={styles.featureBadgeText}>{item.redes_sociales}</Text>
+            </View>
+          )}
+
+          <Text style={styles.featureDescription}>{item.publico_objetivo}</Text>
+          <View style={styles.featureIcons}>
+            <Text style={styles.featureIcon}>📱 {item.datos_móviles}</Text>
+            <Text style={styles.featureIcon}>📞 {item.minutos_voz}</Text>
+          </View>
+        </View>
+        {/* Botón "Ver Detalles" */}
+
+        
+        {/* <TouchableOpacity
+          style={[styles.button, styles.buttonPrimary]}
+          onPress={() => router.push(`/detallePlan?id=${item.id}`)}
+        >
+          <Text style={styles.buttonText}>Ver Detalles</Text>
+        </TouchableOpacity> */}
+
+
+      </View>
+    </View>
+  );
+
   if (cargando) {
     return (
       <View style={globalStyles.loadingContainer}>
@@ -94,50 +132,21 @@ export default function HomeScreen() {
           <Text style={globalStyles.buttonText}>Salir</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Sección de Planes Disponibles */}
+      <Text style={styles.sectionTitle}>Planes Disponibles</Text>
       <FlatList
-        data={[]}
-        ListHeaderComponent={
-          <>
-            <Text style={styles.sectionTitle}>Planes Disponibles</Text>
-            {planes.length === 0 ? (
-              <Text style={globalStyles.emptyState}>No hay planes disponibles</Text>
-            ) : (
-              <FlatList
-                data={planes.slice(0, 3)}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={{ gap: spacing.md }}
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    style={[globalStyles.card, styles.rutinaCard]}
-                    onPress={() => router.push(`/detallePlan?id=${item.id}`)}
-                  >
-                    <Text style={styles.tituloReceta}>{item.nombre_comercial}</Text>
-                    <Text style={globalStyles.textSecondary} numberOfLines={2}>
-                      ${item.precio}/mes
-                    </Text>
-                  </TouchableOpacity>
-                )}
-                keyExtractor={(item) => item.id}
-              />
-            )}
-            <TouchableOpacity
-              style={[globalStyles.button, globalStyles.buttonSecondary, styles.verMasButton]}
-              onPress={() => router.push("/(tabs)/misPlanes")}
-            >
-              <Text style={globalStyles.buttonText}>Ver planes.</Text>
-            </TouchableOpacity>
-          </>
-        }
+        data={planes}
+        keyExtractor={(item) => item.id}
         contentContainerStyle={{ padding: spacing.md }}
+        renderItem={renderItem}
+        ListEmptyComponent={<Text style={globalStyles.emptyState}>No hay planes disponibles</Text>}
         refreshControl={
           <RefreshControl
             refreshing={refrescando}
             onRefresh={handleRefresh}
           />
         }
-        renderItem={() => null}
-        keyExtractor={() => "header"}
       />
     </View>
   );
@@ -163,18 +172,78 @@ const styles = StyleSheet.create({
     fontSize: fontSize.lg,
     fontWeight: "bold",
     color: colors.textPrimary,
-    marginVertical: spacing.md,
+    marginHorizontal: spacing.md,
+    marginBottom: spacing.sm,
   },
-  rutinaCard: {
-    width: 200,
+  // Estilos para la tarjeta de plan
+  planCard: {
+    margin: spacing.md,
+    borderRadius: borderRadius.lg,
+    overflow: 'hidden',
+    backgroundColor: colors.white,
+    ...shadows.medium,
   },
-  tituloReceta: {
-    fontSize: fontSize.md,
-    fontWeight: "bold",
+  headerGradient: {
+    height: 150,
+    backgroundColor: '#00BFFF', // Color azul cian como en la imagen (puedes usar un gradiente real si es necesario)
+  },
+  planContent: {
+    padding: spacing.md,
+  },
+  planTitle: {
+    fontSize: fontSize.xl,
+    fontWeight: 'bold',
     color: colors.textPrimary,
-    marginBottom: spacing.xs,
+    marginBottom: spacing.sm,
   },
-  verMasButton: {
-    marginVertical: spacing.md,
+  planPrice: {
+    fontSize: fontSize.xxxl,
+    fontWeight: 'bold',
+    color: colors.primary,
+    marginBottom: spacing.md,
+  },
+  featuresContainer: {
+    marginBottom: spacing.lg,
+  },
+  featureBadge: {
+    backgroundColor: '#FFF9C4', // Amarillo claro
+    borderRadius: borderRadius.round,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    alignSelf: 'flex-start',
+    marginBottom: spacing.sm,
+  },
+  featureBadgeText: {
+    fontSize: fontSize.sm,
+    color: colors.textPrimary,
+    fontWeight: '600',
+  },
+  featureDescription: {
+    fontSize: fontSize.md,
+    color: colors.textSecondary,
+    marginBottom: spacing.sm,
+  },
+  featureIcons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  featureIcon: {
+    fontSize: fontSize.sm,
+    color: colors.textSecondary,
+  },
+  button: {
+    borderRadius: borderRadius.lg,
+    paddingVertical: spacing.lg,
+    alignItems: "center",
+    justifyContent: "center",
+    ...shadows.medium,
+  },
+  buttonPrimary: {
+    backgroundColor: colors.primary, // Azul
+  },
+  buttonText: {
+    color: colors.white,
+    fontSize: fontSize.md,
+    fontWeight: "600",
   },
 });

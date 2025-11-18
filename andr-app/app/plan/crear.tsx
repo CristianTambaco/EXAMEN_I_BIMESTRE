@@ -217,9 +217,7 @@ export default function CrearPlanScreen() {
       {/* Barra superior */}
       <View style={styles.headerBar}>
 
-        {/* <TouchableOpacity onPress={() => router.push("/(asesor)/dashboard")}>
-          <Text style={styles.botonVolver}>← Volver</Text>
-        </TouchableOpacity> */}
+        
 
         <Text style={styles.headerTitle}>Crear Nuevo Plan</Text>
       </View>
