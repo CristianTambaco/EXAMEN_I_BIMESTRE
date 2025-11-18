@@ -1,6 +1,6 @@
-// app/(tabs)/misPlanes.tsx (Versión corregida)
+// app/(tabs)/misPlanes.tsx
 import { useRouter } from "expo-router";
-import React, { useEffect, useState, useCallback } from "react"; // 👈 Añade 'useCallback'
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -18,16 +18,39 @@ import {
   colors,
   fontSize,
   spacing,
+  borderRadius,
+  shadows
 } from "../../src/styles/theme";
 
 export default function MisPlanesScreen() {
-  const { usuario, esUsuarioRegistrado, esAsesorComercial } = useAuth();
+  const { usuario, esAsesorComercial, esUsuarioRegistrado } = useAuth();
   const { planes, cargando, cargarPlanesPublicos, cargarPlanesAsesor, eliminar } = usePlanes();
   const [refrescando, setRefrescando] = useState(false);
   const router = useRouter();
 
-  // 👇 Usa useCallback para definir handleEliminar
-  const handleEliminar = useCallback(async (planId: string) => {
+  useEffect(() => {
+    const cargar = async () => {
+      if (esAsesorComercial && usuario?.id) {
+        await cargarPlanesAsesor(usuario.id);
+      } else if (esUsuarioRegistrado) {
+        await cargarPlanesPublicos();
+      }
+    };
+    cargar();
+  }, [esAsesorComercial, esUsuarioRegistrado, usuario?.id]);
+
+  const handleRefresh = async () => {
+    setRefrescando(true);
+    if (esAsesorComercial && usuario?.id) {
+      await cargarPlanesAsesor(usuario.id);
+    } else if (esUsuarioRegistrado) {
+      await cargarPlanesPublicos();
+    }
+    setRefrescando(false);
+  };
+
+  // Función para eliminar un plan (solo para asesores)
+  const handleEliminar = async (planId: string) => {
     Alert.alert(
       "Confirmar eliminación",
       "¿Estás seguro de que quieres eliminar este plan?",
@@ -49,27 +72,6 @@ export default function MisPlanesScreen() {
         },
       ]
     );
-  }, [eliminar, usuario]); // 👈 Dependencias: eliminar y usuario
-
-  useEffect(() => {
-    const cargar = async () => {
-      if (esAsesorComercial && usuario?.id) {
-        await cargarPlanesAsesor(usuario.id);
-      } else if (esUsuarioRegistrado) {
-        await cargarPlanesPublicos();
-      }
-    };
-    cargar();
-  }, [esAsesorComercial, esUsuarioRegistrado, usuario?.id]);
-
-  const handleRefresh = async () => {
-    setRefrescando(true);
-    if (esAsesorComercial && usuario?.id) {
-      await cargarPlanesAsesor(usuario.id);
-    } else if (esUsuarioRegistrado) {
-      await cargarPlanesPublicos();
-    }
-    setRefrescando(false);
   };
 
   const renderItem = ({ item }: { item: any }) => (
@@ -97,7 +99,7 @@ export default function MisPlanesScreen() {
               globalStyles.buttonDanger,
               styles.botonAccion,
             ]}
-            onPress={() => handleEliminar(item.id)} // 👈 Ahora sí existe y es segura
+            onPress={() => handleEliminar(item.id)}
           >
             <Text style={globalStyles.buttonText}>🗑️ Eliminar</Text>
           </TouchableOpacity>
@@ -124,17 +126,22 @@ export default function MisPlanesScreen() {
 
   return (
     <View style={globalStyles.container}>
+      {/* Barra superior */}
       <View style={styles.header}>
-        <Text style={globalStyles.title}>{esAsesorComercial ? "Mis Planes" : "Catálogo de Planes"}</Text>
+        <Text style={globalStyles.title}>
+          {esAsesorComercial ? "Gestión de Planes" : "Catálogo de Planes"}
+        </Text>
         {esAsesorComercial && (
           <TouchableOpacity
             style={[globalStyles.button, globalStyles.buttonPrimary]}
             onPress={() => router.push("/plan/crear")}
           >
-            <Text style={globalStyles.buttonText}>+ Nuevo</Text>
+            <Text style={globalStyles.buttonText}>+ Crear Nuevo Plan</Text>
           </TouchableOpacity>
         )}
       </View>
+
+      {/* Lista de Planes */}
       <FlatList
         data={planes}
         keyExtractor={(item) => item.id}

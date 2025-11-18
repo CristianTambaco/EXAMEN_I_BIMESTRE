@@ -1,12 +1,10 @@
-// app/(tabs)/_layout.tsx (Modificado)
+// app/(tabs)/_layout.tsx
 import { Tabs } from "expo-router";
 import React from "react";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useAuth } from "../../src/presentation/hooks/useAuth";
-
-
 import { colors, fontSize } from "@/src/styles/theme";
 
 export default function TabLayout() {
@@ -19,7 +17,7 @@ export default function TabLayout() {
         screenOptions={{
           tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
           headerShown: false,
-          tabBarLabelStyle: { fontSize: fontSize.sm, fontWeight: '600' }, 
+          tabBarLabelStyle: { fontSize: fontSize.sm, fontWeight: '600' },
           tabBarStyle: { backgroundColor: colors.white, borderTopWidth: 1, borderTopColor: colors.borderLight },
         }}
       >
@@ -35,9 +33,9 @@ export default function TabLayout() {
         <Tabs.Screen
           name="misPlanes"
           options={{
-            title: "Mis Planes",
+            title: "Planes",
             tabBarIcon: ({ color }) => (
-              <MaterialIcons name="list-alt" size={28} color={color} />
+              <MaterialIcons name="shopping-cart" size={28} color={color} />
             ),
           }}
         />
@@ -46,7 +44,7 @@ export default function TabLayout() {
           options={{
             title: "Solicitudes",
             tabBarIcon: ({ color }) => (
-              <MaterialIcons name="pending-actions" size={28} color={color} />
+              <MaterialIcons name="receipt" size={28} color={color} />
             ),
           }}
         />
@@ -131,6 +129,7 @@ export default function TabLayout() {
     );
   }
 
+  // Si no hay usuario autenticado o no tiene un rol válido, muestra una pantalla vacía
   return (
     <Tabs
       screenOptions={{
