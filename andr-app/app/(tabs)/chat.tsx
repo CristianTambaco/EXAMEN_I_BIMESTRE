@@ -22,8 +22,9 @@ import { colors, fontSize, spacing, borderRadius } from "@/src/styles/theme";
 
 export default function ChatScreen() {
   const { mensajes, cargando, enviando, enviarMensaje, usuariosEscribiendo, setInputTexto, inputTexto } = useChat();
-  const { usuario } = useAuth();
+  const { usuario, esAsesorComercial } = useAuth();
   const flatListRef = useRef<FlatList>(null);
+  
 
   useEffect(() => {
     if (mensajes.length > 0) {
@@ -103,7 +104,7 @@ export default function ChatScreen() {
       {/* Barra superior */}
       <View style={styles.headerBar}>
         <View style={styles.rolLabelContainer}>
-          {/* <Text style={styles.rolLabel}>Asesor Comercial</Text> */}
+          <Text style={styles.rolLabel}>{esAsesorComercial ? "💼 Asesor Comercial" : "👤 Usuario Registrado"}</Text>
         </View>
         <Text style={styles.headerTitle}>Conversaciones</Text>
         <TouchableOpacity style={styles.menuButton}>

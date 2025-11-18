@@ -80,7 +80,7 @@ export default function PerfilScreen() {
         </View>
         <Text style={styles.headerTitle}>Mi Perfil</Text>
         <TouchableOpacity style={styles.menuButton}>
-          <Text style={styles.menuIcon}>☰</Text>
+          {/* <Text style={styles.menuIcon}>☰</Text> */}
         </TouchableOpacity>
       </View>
       <View style={globalStyles.contentPadding}>
