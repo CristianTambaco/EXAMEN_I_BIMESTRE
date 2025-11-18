@@ -26,8 +26,7 @@ export function usePlanes() {
   const crear = async (planData: Omit<Plan, 'id' | 'created_at' | 'updated_at' | 'activo'>) => {
     const resultado = await planesUseCase.crearPlan(planData);
     if (resultado.success) {
-      // Opcional: Recargar lista de asesor
-      // await cargarPlanesAsesor(asesorId);
+      // No recargamos aquí porque el plan nuevo se agrega automáticamente
     }
     return resultado;
   };
@@ -35,17 +34,27 @@ export function usePlanes() {
   const actualizar = async (id: string, planData: Partial<Omit<Plan, 'id' | 'created_at' | 'updated_at'>>) => {
     const resultado = await planesUseCase.actualizarPlan(id, planData);
     if (resultado.success) {
-      // Actualizar estado local si es necesario
+      // Actualizamos el estado local si es necesario
     }
     return resultado;
   };
 
+  //  MODIFICACIÓN: La función eliminar ahora recarga la lista
   const eliminar = async (id: string) => {
     const resultado = await planesUseCase.eliminarPlan(id);
     if (resultado.success) {
-      // Actualizar estado local si es necesario
+      
     }
     return resultado;
+  };
+
+  // Recargar la lista de planes
+  const recargarPlanes = async (asesorId?: string) => {
+    if (asesorId) {
+      await cargarPlanesAsesor(asesorId);
+    } else {
+      await cargarPlanesPublicos();
+    }
   };
 
   return {
@@ -56,5 +65,6 @@ export function usePlanes() {
     crear,
     actualizar,
     eliminar,
+    recargarPlanes, //
   };
 }
