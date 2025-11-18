@@ -107,7 +107,9 @@ export default function ChatScreen() {
         </View>
         <Text style={styles.headerTitle}>Conversaciones</Text>
         <TouchableOpacity style={styles.menuButton}>
-          <Text style={styles.menuIcon}>☰</Text>
+          
+          {/* <Text style={styles.menuIcon}>☰</Text> */}
+
         </TouchableOpacity>
       </View>
 

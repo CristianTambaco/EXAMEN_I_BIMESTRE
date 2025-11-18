@@ -82,7 +82,8 @@ export default function PerfilScreen() {
         {/* Botones de acción */}
         <TouchableOpacity
           style={[styles.button, styles.buttonPrimary]}
-          onPress={() => Alert.alert("Funcionalidad no implementada")}
+
+        //   onPress={() => Alert.alert("Funcionalidad no implementada")}
         >
           <Text style={styles.buttonText}>Editar Perfil</Text>
         </TouchableOpacity>
